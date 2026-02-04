@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#1F1F1F" />
+    <title>MNAC | Museu Nacional d'Art de Catalunya</title>
+    <!-- Tailwind CSS CDN para desarrollo rápido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Manrope:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"DM Sans"', 'sans-serif'],
+              display: ['"Manrope"', 'sans-serif'],
+              serif: ['"Playfair Display"', 'serif'],
+            },
+            colors: {
+              mnac: {
+                // New Identity: Warm Charcoal, Stone Beige, Vermilion
+                bg: '#1F1F1F',          // MNAC Surface
+                surface: '#262626',     // Slightly lighter for cards
+                secondary: '#D1CCBF',   // MNAC Primary Text (Beige)
+                accent: '#F14A32',      // MNAC Accent (Vermilion)
+                
+                // Mappings for compatibility
+                textPrimary: '#D1CCBF', 
+                textSecondary: '#9CA3AF',
+                divider: 'rgba(209, 204, 191, 0.1)', // Beige with opacity
+                
+                // Legacy
+                red: '#F14A32',
+                gold: '#D1CCBF',
+                cream: '#1F1F1F',
+                dark: '#000000',
+              }
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.6s ease-out forwards',
+              'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'scale-slow': 'scaleSlow 20s linear infinite alternate',
+              'panel-slide-right': 'panelSlideRight 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards',
+              'shimmer': 'shimmer 2s linear infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              scaleSlow: {
+                '0%': { transform: 'scale(1)' },
+                '100%': { transform: 'scale(1.1)' },
+              },
+              panelSlideRight: {
+                '0%': { transform: 'translateX(100%)' },
+                '100%': { transform: 'translateX(0)' },
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #1F1F1F;
+        color: #D1CCBF;
+        /* NATIVE APP FEEL CSS */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        overscroll-behavior-y: none;
+        font-family: 'DM Sans', sans-serif;
+      }
+      
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      .pt-safe { padding-top: max(20px, env(safe-area-inset-top)); }
+      .pb-safe { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+      
+      /* Hide scrollbar */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+      /* Global Focus Styles */
+      *:focus-visible {
+        outline: 2px solid #D1CCBF;
+        outline-offset: 4px;
+      }
+      
+      ::selection {
+        background-color: #F14A32;
+        color: #FFFFFF;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite-plugin-pwa": "https://esm.sh/vite-plugin-pwa@^1.2.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1",
+    "@capacitor/core": "https://esm.sh/@capacitor/core@^8.0.1",
+    "@capacitor/cli": "https://esm.sh/@capacitor/cli@^8.0.1",
+    "@capacitor/status-bar": "https://esm.sh/@capacitor/status-bar@^8.0.0",
+    "@capacitor/splash-screen": "https://esm.sh/@capacitor/splash-screen@^8.0.0",
+    "@tanstack/react-query": "https://esm.sh/@tanstack/react-query@^5.90.19",
+    "react-virtuoso": "https://esm.sh/react-virtuoso@^4.18.1",
+    "@capacitor/filesystem": "https://esm.sh/@capacitor/filesystem@^8.0.0",
+    "@capacitor/network": "https://esm.sh/@capacitor/network@^8.0.0",
+    "@capacitor-community/text-to-speech": "https://esm.sh/@capacitor-community/text-to-speech@^6.1.0",
+    "html5-qrcode": "https://esm.sh/html5-qrcode@^2.3.8",
+    "@capacitor/haptics": "https://esm.sh/@capacitor/haptics@^8.0.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

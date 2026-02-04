@@ -1,0 +1,8 @@
+{
+  "name": "MNAC Virtual Experience_v4",
+  "description": "A virtual exploration of the Museu Nacional d'Art de Catalunya featuring an AI-powered art guide.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
