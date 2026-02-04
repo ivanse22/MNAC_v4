@@ -15,7 +15,7 @@ function base64ToArrayBuffer(base64: string) {
   return bytes.buffer;
 }
 
-function createWavFile(samples: ArrayBuffer) {
+function createWavFile(samples: ArrayBufferLike) {
   const buffer = new ArrayBuffer(44 + samples.byteLength);
   const view = new DataView(buffer);
   const channels = 1;
