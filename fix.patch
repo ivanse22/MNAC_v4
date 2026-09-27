@@ -1,0 +1,18 @@
+--- src/pages/TourPlayer.tsx
++++ src/pages/TourPlayer.tsx
+@@ -272,3 +272,11 @@
+             {/* Footer Metadata */}
+             <div className="mt-8 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+-               <div className="flex items-center gap
+\ No newline at end of file
++               <div className="flex items-center gap-2">
++                  <span>MNAC - Museu Nacional d'Art de Catalunya</span>
++               </div>
++            </div>
++         </div>
++      </div>
++    </div>
++  );
++};
++
++export default TourPlayer;
