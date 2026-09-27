@@ -271,4 +271,12 @@ const TourPlayer: React.FC<TourPlayerProps> = ({ userRole }) => {
             
             {/* Footer Metadata */}
             <div className="mt-8 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-               <div className="flex items-center gap
+               <div className="flex items-center gap-2">
+                  <span>MNAC - Museu Nacional d'Art de Catalunya</span>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+};
