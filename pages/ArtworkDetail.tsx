@@ -146,11 +146,11 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ userRole, easyReading, sa
             </div>
 
             {/* Action Buttons Row */}
-            <div className="flex flex-wrap gap-4 pt-8 border-t border-white/10">
+            <div className="flex flex-wrap gap-3 sm:gap-4 pt-8 border-t border-white/10 pb-24 md:pb-0">
                {/* Primary Action */}
                <button 
                   onClick={handlePrimaryAction} 
-                  className="bg-white text-black hover:bg-mnac-accent hover:text-white px-8 py-4 text-xs font-bold uppercase tracking-widest transition-all shadow-lg flex items-center gap-3 rounded-sm"
+                  className="bg-mnac-accent text-white hover:opacity-90 active:scale-95 px-7 py-3.5 text-xs font-bold uppercase tracking-widest transition-all shadow-lg flex items-center gap-3 rounded-full"
                >
                   {isGeneratingAudio ? <Loader2 size={16} className="animate-spin" /> : (isAudioPlaying ? <Pause size={16} /> : (userRole === 'teacher' ? <PlusCircle size={16}/> : <Headphones size={16} />))}
                   {userRole === 'teacher' ? (isSaved ? 'Obra en tu Guía' : 'Añadir a Guía') : (isAudioPlaying ? 'Pausar Audio' : 'Oír Audioguía')}
@@ -159,7 +159,7 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ userRole, easyReading, sa
                {/* Secondary Action */}
                <button 
                   onClick={() => onToggleSave(artwork.id)}
-                  className={`px-8 py-4 text-xs font-bold uppercase tracking-widest border transition-all flex items-center gap-3 rounded-sm ${
+                  className={`px-7 py-3.5 text-xs font-bold uppercase tracking-widest border active:scale-95 transition-all flex items-center gap-3 rounded-full ${
                     isSaved 
                       ? 'bg-transparent border-mnac-accent text-mnac-accent hover:bg-mnac-accent/10' 
                       : 'bg-transparent border-white/20 text-white hover:border-white'

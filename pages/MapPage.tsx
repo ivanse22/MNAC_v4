@@ -35,13 +35,13 @@ const MapPage: React.FC<MapPageProps> = ({ userRole }) => {
   const handleZoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.8));
 
   return (
-    <div className="h-[100dvh] w-full bg-[#F4F4F0] relative overflow-hidden flex flex-col font-sans text-mnac-dark">
+    <div className="h-[100dvh] w-full bg-mnac-bg relative overflow-hidden flex flex-col font-sans text-mnac-textPrimary">
        
        {/* --- MAP VIEWPORT --- */}
-       <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[#F4F4F0]">
+       <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-mnac-bg">
             
-            {/* Texture Background (Paper feel) */}
-            <div className="absolute inset-0 opacity-40 pointer-events-none" style={{backgroundImage: `url("https://www.transparenttextures.com/patterns/cream-paper.png")`}}></div>
+            {/* Texture Background (Subtle architectural grid) */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: `radial-gradient(#D1CCBF 1px, transparent 1px)`, backgroundSize: '24px 24px'}}></div>
 
             <div 
                 className="relative transition-transform duration-500 cubic-bezier(0.25, 0.46, 0.45, 0.94) touch-none"

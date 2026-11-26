@@ -63,7 +63,7 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
   };
 
   return (
-    <div className="bg-mnac-bg min-h-screen text-mnac-textPrimary">
+    <div className="bg-mnac-bg min-h-screen text-mnac-textPrimary pb-24 md:pb-0">
       
       {/* MODAL GENERACIÓN IA - DARK */}
       {isModalOpen && (
