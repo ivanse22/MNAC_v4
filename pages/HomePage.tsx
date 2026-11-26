@@ -53,9 +53,9 @@ const FEATURED_SECTIONS = [
 
 const QUICK_ACTIONS = [
   { label: 'Escanear', icon: QrCode, to: '/tours', accent: true },
-  { label: 'Mapa', icon: MapPin, to: '/map', accent: false },
+  { label: 'Mapa', icon: MapPin, to: '/visit/map', accent: false },
   { label: 'Audioguías', icon: Headphones, to: '/tours', accent: false },
-  { label: 'Palau IA', icon: Sparkles, to: '/ai-search', accent: false },
+  { label: 'Palau IA', icon: Sparkles, to: '/collection/ai-search', accent: false },
 ];
 
 const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVisible }) => {
@@ -166,7 +166,7 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
       {/* QUICK SEARCH & QUICK ACTIONS (MOBILE APP BAR) */}
       <section className="px-5 sm:px-6 md:px-12 pt-6 pb-4 max-w-[1920px] mx-auto w-full space-y-5">
         <Link
-          to="/ai-search"
+          to="/collection/ai-search"
           onClick={() => hapticService.light()}
           className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl bg-mnac-surface border border-white/10 text-mnac-textSecondary active:scale-[0.99] transition-transform"
         >
@@ -311,7 +311,7 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
           {quickArtworks.map((art) => (
             <Link
               key={art.id}
-              to="/tours"
+              to={`/artwork/${art.id}`}
               onClick={() => hapticService.light()}
               className="shrink-0 w-[62vw] sm:w-[42vw] md:w-[240px] snap-start rounded-2xl overflow-hidden bg-mnac-surface border border-white/10 active:scale-95 transition-transform"
             >
