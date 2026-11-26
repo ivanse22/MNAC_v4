@@ -50,7 +50,7 @@ const PremiumBadgeVisual = ({ iconName, level, locked, size = 'md' }: { iconName
   const containerSize = size === 'lg' ? 'w-48 h-56' : size === 'md' ? 'w-24 h-28' : 'w-12 h-14';
   
   const getMetalGradient = () => {
-    if (locked) return 'bg-gray-800 border-gray-700';
+    if (locked) return 'bg-mnac-surface border-white/10';
     switch(level) {
       case 'platinum': return 'bg-gradient-to-b from-[#e0e7ff] via-[#6366f1] to-[#312e81] shadow-[0_0_25px_rgba(99,102,241,0.5)]';
       case 'gold': return 'bg-gradient-to-b from-[#F9DF86] via-[#D4AF37] to-[#8a6e18] shadow-[0_0_25px_rgba(212,175,55,0.4)]';
@@ -391,7 +391,7 @@ const BadgesPage: React.FC<BadgesPageProps> = ({ badges = [], progress, leaderbo
                           <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Recompensa</span>
                           <span className="text-xs text-white font-mono">+{selectedBadge.xpReward} XP</span>
                        </div>
-                       <button onClick={handleShare} className="w-full py-4 bg-white text-black rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-mnac-gold transition-colors flex items-center justify-center gap-2 shadow-lg">
+                       <button onClick={handleShare} className="w-full py-4 bg-mnac-accent text-white rounded-full text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg">
                           <Share2 size={16} /> Compartir Logro
                        </button>
                     </div>

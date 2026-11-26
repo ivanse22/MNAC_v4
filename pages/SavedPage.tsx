@@ -23,47 +23,47 @@ const SavedPage: React.FC<SavedPageProps> = ({ savedArtIds, onToggleSave }) => {
   }, [savedArtIds]); // Recalcular solo si cambia la lista de guardados
 
   return (
-    <div className="min-h-screen bg-mnac-cream flex flex-col pt-20">
+    <div className="min-h-screen bg-mnac-bg text-mnac-textPrimary flex flex-col pt-20 pb-24 md:pb-0">
       
       {/* Hero Section */}
-      <div className="bg-white border-b border-gray-200 py-16 px-6 md:px-12">
+      <div className="bg-mnac-surface border-b border-white/10 py-12 md:py-16 px-5 sm:px-6 md:px-12">
         <div className="max-w-[1920px] mx-auto">
            <div className="flex items-center gap-3 mb-4">
-              <Bookmark className="text-mnac-red" size={24} />
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Mi Espacio</span>
+              <Bookmark className="text-mnac-accent" size={22} />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent">Mi Espacio</span>
            </div>
-           <h1 className="font-serif italic text-5xl md:text-7xl text-mnac-dark mb-6">Colección Privada</h1>
-           <p className="text-gray-500 font-light text-lg md:text-xl max-w-2xl leading-relaxed">
+           <h1 className="font-serif italic text-4xl sm:text-5xl md:text-7xl text-white mb-4">Colección Privada</h1>
+           <p className="text-mnac-textSecondary font-light text-base md:text-xl max-w-2xl leading-relaxed">
              Tu archivo personal de obras maestras. Añade notas de estudio, organiza tus referencias y construye tu propio museo.
            </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow max-w-[1920px] mx-auto px-6 md:px-12 py-12 w-full">
+      <div className="flex-grow max-w-[1920px] mx-auto px-5 sm:px-6 md:px-12 py-10 w-full">
         
         {savedArtworks.length > 0 ? (
           <div className="animate-slide-up">
              {/* Toolbar */}
-             <div className="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
-                <span className="text-sm font-bold uppercase tracking-widest text-gray-500">
+             <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                <span className="text-xs font-bold uppercase tracking-widest text-mnac-textSecondary">
                   {savedArtworks.length} Obras Guardadas
                 </span>
-                <button className="hidden md:flex items-center gap-2 bg-mnac-dark text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-mnac-red transition-all shadow-lg">
+                <button className="hidden md:flex items-center gap-2 bg-mnac-accent text-white rounded-full px-6 py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-lg">
                    <Download size={16} /> Generar PDF de Estudio
                 </button>
              </div>
 
              {/* Masonry-ish Grid */}
-             <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+             <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                 {savedArtworks.map((art) => (
-                  <div key={art.id} className="break-inside-avoid bg-white p-4 shadow-sm border border-gray-100 group hover:shadow-xl transition-all duration-300">
-                      <div className="relative mb-4 overflow-hidden">
+                  <div key={art.id} className="break-inside-avoid bg-mnac-surface p-4 rounded-2xl border border-white/10 group hover:border-white/25 transition-all duration-300">
+                      <div className="relative mb-4 overflow-hidden rounded-xl">
                          <img src={art.imageUrl} alt={art.title} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" />
-                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="absolute top-2 right-2">
                             <button 
                               onClick={() => onToggleSave(art.id)}
-                              className="bg-white text-mnac-red p-2 rounded-full shadow-md hover:bg-red-50"
+                              className="bg-black/60 backdrop-blur-md text-mnac-accent p-2 rounded-full border border-white/10 active:scale-95 transition-transform"
                             >
                               <Bookmark size={16} fill="currentColor" />
                             </button>
@@ -71,11 +71,11 @@ const SavedPage: React.FC<SavedPageProps> = ({ savedArtIds, onToggleSave }) => {
                       </div>
                       
                       <div className="mb-4">
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">{art.period}</span>
-                         <h3 className="font-serif text-2xl text-mnac-dark leading-tight mb-1">
-                            <Link to={`/artwork/${art.id}`} className="hover:text-mnac-red transition-colors">{art.title}</Link>
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-mnac-accent block mb-1">{art.period}</span>
+                         <h3 className="font-serif italic text-2xl text-white leading-tight mb-1">
+                            <Link to={`/artwork/${art.id}`} className="hover:text-mnac-accent transition-colors">{art.title}</Link>
                          </h3>
-                         <p className="text-xs font-bold text-gray-500 uppercase">{art.artist}</p>
+                         <p className="text-xs font-bold text-mnac-textSecondary uppercase">{art.artist}</p>
                       </div>
 
                       {/* Personal Note Area */}

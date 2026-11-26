@@ -138,10 +138,10 @@ const TourPlayer: React.FC<TourPlayerProps> = ({ userRole }) => {
     }
   };
 
-  if (!currentTour || !currentArtwork) return <div className="text-white p-8 flex items-center justify-center h-screen bg-black"><Loader2 className="animate-spin mr-2" /> Cargando ruta...</div>;
+  if (!currentTour || !currentArtwork) return <div className="text-white p-8 flex items-center justify-center h-screen bg-mnac-bg"><Loader2 className="animate-spin mr-2" /> Cargando ruta...</div>;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black text-white flex flex-col animate-fade-in">
+    <div className="fixed inset-0 z-[100] bg-mnac-bg text-mnac-textPrimary flex flex-col animate-fade-in">
       
       {/* Hidden Audio Element */}
       {audioUrl && (
