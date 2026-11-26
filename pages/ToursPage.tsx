@@ -24,7 +24,7 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
   // Leer filtro desde la URL
   useEffect(() => {
     const filterParam = searchParams.get('filter');
-    if (filterParam && ['Highlights', 'Modernismo', 'Románico', 'Cortos'].includes(filterParam)) {
+    if (filterParam && ['Highlights', 'Modernismo', 'Románico', 'Gótico', 'Renacimiento', 'Cortos'].includes(filterParam)) {
       setActiveFilter(filterParam);
       setTimeout(() => {
          document.getElementById('catalog-start')?.scrollIntoView({ behavior: 'smooth' });
@@ -210,15 +210,15 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
               <p className="text-gray-500 text-base font-light">Selección oficial del equipo educativo del museo.</p>
            </div>
            
-           <div className="flex flex-wrap gap-3">
-              {['Todos', 'Highlights', 'Modernismo', 'Románico', 'Cortos'].map(filter => (
+           <div className="flex flex-wrap gap-2.5">
+              {['Todos', 'Highlights', 'Románico', 'Gótico', 'Renacimiento', 'Modernismo', 'Cortos'].map(filter => (
                  <button 
                    key={filter}
                    onClick={() => setActiveFilter(filter)}
-                   className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                   className={`px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest border active:scale-95 transition-all ${
                       activeFilter === filter 
-                      ? 'bg-white text-black border-white shadow-lg' 
-                      : 'bg-transparent text-gray-500 border-white/20 hover:border-white hover:text-white'
+                      ? 'bg-mnac-accent text-white border-mnac-accent shadow-lg' 
+                      : 'bg-mnac-surface text-mnac-textSecondary border-white/15 hover:border-white hover:text-white'
                    }`}
                  >
                     {filter}

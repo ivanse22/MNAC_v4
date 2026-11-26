@@ -40,23 +40,31 @@ export const IMAGES = {
     paredVerde:
       "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=800&auto=format&fit=crop",
     consagracionAgustin:
-      "https://www.museunacional.cat/sites/default/files/styles/adaptive/public/asdfasdfads_0.jpg",
+      "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?q=80&w=800&auto=format&fit=crop",
     laVicaria:
       "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop",
     agnusDei:
-      "https://upload.wikimedia.org/wikipedia/commons/e/ef/Francisco_de_Zurbar%C3%A1n_006.jpg",
+      "https://images.unsplash.com/photo-1518998053901-5348d3961a04?q=80&w=800&auto=format&fit=crop",
     composicionAbstracta:
       "https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=800&auto=format&fit=crop",
     pleinAir:
-      "https://www.meisterdrucke.uk/kunstwerke/1260px/Ramon_Casas_-_Plein_air_-_Casas_Ramon_%281866-1932%29_-_c_1890_-_Oil_on_canvas_-_505x65_-_Museu_Na_-_%28MeisterDrucke-1324483%29.jpg",
+      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=800&auto=format&fit=crop",
     sanPedroPablo:
       "https://images.unsplash.com/photo-1577720580479-7d839d829c73?q=80&w=800&auto=format&fit=crop",
     frontalAvia:
-      "https://www.museunacional.cat/sites/default/files/styles/adaptive/public/015784-000_51402ret.jpg",
+      "https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=800&auto=format&fit=crop",
     granadina:
-      "https://www.museunacional.cat/sites/default/files/images/art_piece/first_gallery/34591/156066-000.JPG",
+      "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?q=80&w=800&auto=format&fit=crop",
     suenoSurrealista:
       "https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=800&auto=format&fit=crop",
+    retabloPiedad:
+      "https://images.unsplash.com/photo-1580136579312-94651dfd596d?q=80&w=800&auto=format&fit=crop",
+    inmaculada:
+      "https://images.unsplash.com/photo-1579783901586-d88db74b4fe4?q=80&w=800&auto=format&fit=crop",
+    damaBarcelona:
+      "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=800&auto=format&fit=crop",
+    cristoCrucificado:
+      "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=800&auto=format&fit=crop",
   },
   collections: {
     romanicoSimbolismo:
@@ -68,6 +76,12 @@ export const IMAGES = {
   },
   tourCovers: {
     highlights:
-      "https://www.museunacional.cat/sites/default/files/paragraphs/horizontal_gallery/fc/images/1._064989-000_720x480_1.jpg",
+      "https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=1200&auto=format&fit=crop",
+    gotico:
+      "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?q=80&w=1200&auto=format&fit=crop",
+    renacimiento:
+      "https://images.unsplash.com/photo-1577720580479-7d839d829c73?q=80&w=1200&auto=format&fit=crop",
+    vanguardia:
+      "https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1200&auto=format&fit=crop",
   },
 };

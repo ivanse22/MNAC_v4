@@ -147,5 +147,53 @@ export const ARTWORKS_DATA: ArtWork[] = [
     simpleDescription: "Un cuadro muy raro donde las cosas no tienen sentido lógico, como en un sueño extraño donde todo cambia de forma.",
     teacherDescription: "El método paranoico-crítico de Dalí. Simbolismo freudiano y la ruptura con la lógica racional en el arte del siglo XX.",
     tags: ["Surrealismo", "Sueño", "Paisaje", "Psicoanálisis", "Fantasía"]
+  },
+  {
+    id: 'art-12',
+    title: "La Piedad Desplà",
+    artist: "Bartolomé Bermejo",
+    period: "Gótico",
+    year: "1490",
+    imageUrl: IMAGES.artworks.retabloPiedad,
+    description: "Una de las cumbres de la pintura gótica hispanoflamenca. Destaca por el realismo minucioso de la flora, el paisaje crepuscular y la intensidad dramática del rostro de la Virgen.",
+    simpleDescription: "Una escena triste pero muy detallada donde la Virgen sostiene a Jesús. Al fondo hay un paisaje con plantas y animales pintados con enorme precisión.",
+    teacherDescription: "Transición del Gótico al Renacimiento. Influencia de la pintura flamenca (técnica al óleo, detalle botánico y retrato del donante Lluís Desplà).",
+    tags: ["Religión", "Óleo", "Paisaje", "Gótico Tardío", "Realismo"]
+  },
+  {
+    id: 'art-13',
+    title: "Inmaculada Concepción",
+    artist: "Francisco de Zurbarán",
+    period: "Barroco",
+    year: "1632",
+    imageUrl: IMAGES.artworks.inmaculada,
+    description: "Luz celestial y volúmenes escultóricos envuelven la figura juvenil. Zurbarán combina el recogimiento místico con una delicadeza cromática propia del Siglo de Oro.",
+    simpleDescription: "Una figura vestida de blanco y azul rodeada de nubes doradas y pequeños ángeles, con una luz muy suave.",
+    teacherDescription: "Iconografía contrarreformista en el Barroco español. Analizar la composición piramidal, la luz dorada y el tratamiento de los paños.",
+    tags: ["Religión", "Barroco", "Luz", "Simbolismo", "Retrato"]
+  },
+  {
+    id: 'art-14',
+    title: "Retrato de Dama",
+    artist: "Tiziano (Círculo)",
+    period: "Renacimiento",
+    year: "1555",
+    imageUrl: IMAGES.artworks.damaBarcelona,
+    description: "Ejemplo refinado del retrato cortesano veneciano del siglo XVI. La riqueza de las sedas y la serenidad psicológica reflejan el ideal humanista del Renacimiento.",
+    simpleDescription: "El retrato elegante de una mujer del siglo XVI vestida con telas lujosas y joyas, mirando con calma.",
+    teacherDescription: "El retrato veneciano del Cinquecento: uso del color sobre el dibujo, textura de los tejidos y dignidad del retratado.",
+    tags: ["Retrato", "Mujer", "Renacimiento", "Lujo", "Color"]
+  },
+  {
+    id: 'art-15',
+    title: "Majestat Batlló",
+    artist: "Taller de Ripoll",
+    period: "Románico",
+    year: "1150",
+    imageUrl: IMAGES.artworks.cristoCrucificado,
+    description: "Talla en madera policromada excepcional que muestra a Cristo triunfante sobre la muerte, vestido con túnica talar y los ojos abiertos en señal de victoria espiritual.",
+    simpleDescription: "Una escultura antigua de madera pintada de colores vivos. Cristo aparece vestido como un rey, sin mostrar sufrimiento.",
+    teacherDescription: "Iconografía del Christus Triumphans en la escultura románica catalana, en contraste con el Christus Patiens del Gótico.",
+    tags: ["Religión", "Madera", "Escultura", "Edad Media", "Iconografía"]
   }
 ];

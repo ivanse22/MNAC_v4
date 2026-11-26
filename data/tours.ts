@@ -29,11 +29,44 @@ export const TOURS_DATA: Itinerary[] = [
     id: 'tour-misterio',
     title: 'Bestiario Medieval y Misticismo',
     description: 'Descubre el significado oculto de los símbolos románicos. Dragones, santos y miradas que te siguen por la sala.',
-    duration: 30,
+    duration: 25,
     difficulty: 'Baja',
-    tags: ['Románico', 'Misterio', 'Familias'],
-    stops: ['art-0', 'art-9', 'art-3'],
+    tags: ['Románico', 'Misterio', 'Familias', 'Cortos'],
+    stops: ['art-0', 'art-9', 'art-15'],
     coverImage: IMAGES.artworks.frontalAvia,
+    type: 'Curated'
+  },
+  {
+    id: 'tour-gotico',
+    title: 'Esplendor Gótico: Oro y Retablos',
+    description: 'Un viaje por la Corona de Aragón entre pan de oro, gremios medievales y el realismo flamenco de Bermejo y Huguet.',
+    duration: 35,
+    difficulty: 'Baja',
+    tags: ['Gótico', 'Historia', 'Religión'],
+    stops: ['art-3', 'art-12', 'art-9'],
+    coverImage: IMAGES.tourCovers.gotico,
+    type: 'Curated'
+  },
+  {
+    id: 'tour-renacimiento',
+    title: 'Luz y Claroscuro: Siglo de Oro',
+    description: 'De la espiritualidad manierista de El Greco al tenebrismo silencioso de Zurbarán y el retrato veneciano.',
+    duration: 40,
+    difficulty: 'Media',
+    tags: ['Renacimiento', 'Barroco', 'Highlights'],
+    stops: ['art-8', 'art-14', 'art-5', 'art-13'],
+    coverImage: IMAGES.tourCovers.renacimiento,
+    type: 'Curated'
+  },
+  {
+    id: 'tour-vanguardia',
+    title: 'Sueños de Vanguardia Exprés',
+    description: 'Recorrido breve de 20 minutos por la ruptura con la realidad: abstracción, surrealismo y formas oníricas.',
+    duration: 20,
+    difficulty: 'Baja',
+    tags: ['Vanguardia', 'Surrealismo', 'Cortos'],
+    stops: ['art-6', 'art-11', 'art-4'],
+    coverImage: IMAGES.tourCovers.vanguardia,
     type: 'Curated'
   }
 ];
