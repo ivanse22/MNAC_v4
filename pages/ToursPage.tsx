@@ -1,16 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { UserRole } from '../types';
 import { TOURS_DATA } from '../data/tours';
 import { generateCustomItinerary } from '../services/geminiService';
-import { Map, ArrowRight, Sparkles, ChevronDown, Play, X, Loader2, Compass } from 'lucide-react';
+import { Map, ArrowRight, Sparkles, Play, X, Loader2, Clock } from 'lucide-react';
 import Footer from '../components/Footer';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IMAGES } from '../data/images';
+import OptimizedImage from '../components/OptimizedImage';
+import { hapticService } from '../services/hapticService';
 
 interface ToursPageProps {
   userRole: UserRole;
 }
+
+const TOUR_FILTERS = ['Todos', 'Highlights', 'Románico', 'Gótico', 'Renacimiento', 'Modernismo', 'Cortos'];
 
 const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
   const [activeFilter, setActiveFilter] = useState('Todos');
@@ -21,13 +24,12 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Leer filtro desde la URL
   useEffect(() => {
     const filterParam = searchParams.get('filter');
-    if (filterParam && ['Highlights', 'Modernismo', 'Románico', 'Gótico', 'Renacimiento', 'Cortos'].includes(filterParam)) {
+    if (filterParam && TOUR_FILTERS.includes(filterParam)) {
       setActiveFilter(filterParam);
       setTimeout(() => {
-         document.getElementById('catalog-start')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('catalog-start')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
   }, [searchParams]);
@@ -37,25 +39,24 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
     : TOURS_DATA.filter(t => t.tags.includes(activeFilter) || (activeFilter === 'Cortos' && t.duration <= 30));
 
   const handleTourClick = (tourId: string) => {
+    hapticService.light();
     navigate(`/tour/${tourId}/play`);
   };
 
   const handleCreateRoute = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
-
+    hapticService.medium();
     setIsGenerating(true);
     try {
-      const customItinerary = await generateCustomItinerary(prompt);
-      if (customItinerary) {
-        localStorage.setItem('custom_tour_data', JSON.stringify(customItinerary));
-        navigate('/tour/custom/play');
+      const customTour = await generateCustomItinerary(prompt);
+      if (customTour) {
+        navigate(`/tour/${customTour.id}/play`, { state: { customTour } });
       } else {
-        alert("Lo siento, no pude generar una ruta con esas especificaciones.");
+        navigate('/tour/tour-highlights/play');
       }
-    } catch (error) {
-      console.error(error);
-      alert("Error de conexión con Palau.");
+    } catch {
+      navigate('/tour/tour-highlights/play');
     } finally {
       setIsGenerating(false);
       setIsModalOpen(false);
@@ -65,238 +66,263 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
   return (
     <div className="bg-mnac-bg min-h-screen text-mnac-textPrimary pb-24 md:pb-0">
       
-      {/* MODAL GENERACIÓN IA - DARK */}
+      {/* MODAL GENERACIÓN IA */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md animate-fade-in" onClick={() => !isGenerating && setIsModalOpen(false)}></div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-5">
+          <div
+            className="absolute inset-0 bg-black/85 backdrop-blur-md animate-fade-in"
+            onClick={() => !isGenerating && setIsModalOpen(false)}
+          />
           
-          <div className="bg-[#121212] w-full max-w-lg rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative z-10 overflow-hidden animate-pop-in">
-             {/* Background Effects */}
-             <div className="absolute top-0 right-0 w-64 h-64 bg-mnac-accent/20 blur-[80px] rounded-full pointer-events-none"></div>
-             <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-900/20 blur-[80px] rounded-full pointer-events-none"></div>
-
-             <div className="p-8">
-                <div className="flex justify-between items-start mb-6">
-                   <div className="flex items-center gap-3 text-mnac-gold">
-                      <Sparkles size={20} className="animate-pulse" />
-                      <span className="text-xs font-bold uppercase tracking-widest">MNAC Intelligence</span>
-                   </div>
-                   {!isGenerating && (
-                     <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white transition-colors">
-                        <X size={20} />
-                     </button>
-                   )}
+          <div className="bg-mnac-surface w-full max-w-lg rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden animate-pop-in">
+            <div className="p-6 sm:p-8">
+              <div className="flex justify-between items-start mb-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mnac-accent/15 border border-mnac-accent/30 text-mnac-accent">
+                  <Sparkles size={14} className="animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Palau IA</span>
                 </div>
+                {!isGenerating && (
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="p-2 rounded-full bg-white/5 text-mnac-textSecondary hover:text-white active:scale-95 transition-all"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
 
-                <h3 className="font-serif text-3xl text-white mb-2 italic">Diseña tu experiencia</h3>
-                <p className="text-gray-400 text-sm font-light mb-8">
-                   Cuéntale a Palau qué te interesa. Él buscará en el archivo y creará un itinerario a medida con audioguía.
-                </p>
+              <h3 className="font-serif text-3xl text-white mb-2 italic">Diseña tu experiencia</h3>
+              <p className="text-mnac-textSecondary text-sm font-light mb-6 leading-relaxed">
+                Cuéntale a Palau qué te interesa y creará un itinerario a medida con audioguía.
+              </p>
 
-                <form onSubmit={handleCreateRoute}>
-                   <textarea 
-                     value={prompt}
-                     onChange={(e) => setPrompt(e.target.value)}
-                     placeholder="Ej: 'Quiero una ruta sobre dragones y bestias medievales para niños' o 'Obras que muestren la moda del siglo XIX'..."
-                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-mnac-gold/50 focus:bg-white/10 transition-all min-h-[120px] mb-6 resize-none text-base font-light"
-                     disabled={isGenerating}
-                   />
-                   
-                   <button 
-                     type="submit"
-                     disabled={!prompt.trim() || isGenerating}
-                     className="w-full bg-gradient-to-r from-mnac-gold to-yellow-600 text-black py-4 rounded-xl text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                   >
-                      {isGenerating ? (
-                        <>
-                           <Loader2 size={16} className="animate-spin" /> Analizando Colección...
-                        </>
-                      ) : (
-                        <>
-                           <Sparkles size={16} /> Generar Ruta
-                        </>
-                      )}
-                   </button>
-                </form>
-             </div>
+              <form onSubmit={handleCreateRoute}>
+                <textarea 
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ej: 'Quiero una ruta de 20 minutos sobre dragones y bestias medievales'..."
+                  className="w-full bg-mnac-bg border border-white/10 rounded-2xl p-4 text-white placeholder-mnac-textSecondary/50 focus:outline-none focus:border-mnac-accent transition-all min-h-[120px] mb-5 resize-none text-sm font-light"
+                  disabled={isGenerating}
+                />
+                
+                <button 
+                  type="submit"
+                  disabled={!prompt.trim() || isGenerating}
+                  className="w-full bg-mnac-accent text-white py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" /> Analizando Colección...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={16} /> Generar Ruta
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* HERO SECTION */}
-      <div className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-black">
+      {/* HERO SECTION - EDITORIAL MOBILE-FIRST */}
+      <section className="relative w-full h-[55vh] md:h-[70vh] flex flex-col justify-end p-5 sm:p-6 md:p-12 overflow-hidden">
         <div className="absolute inset-0 z-0">
-           <img 
+          <OptimizedImage
             src={IMAGES.tours.hero}
-            className="w-full h-full object-cover animate-scale-slow opacity-60"
-            alt="Sala Oval MNAC"
-           />
-           <div className="absolute inset-0 bg-gradient-to-t from-mnac-bg via-transparent to-black/60"></div>
-           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-mnac-bg/90"></div>
+            alt="Itinerarios MNAC"
+            priority={true}
+            aspectRatio="h-full w-full"
+            className="opacity-65 scale-105 animate-scale-slow"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-mnac-bg via-mnac-bg/40 to-transparent" />
         </div>
+
+        <div className="relative z-10 max-w-[1920px] w-full mx-auto animate-slide-up">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-end border-b border-mnac-divider pb-6 md:pb-8 gap-5">
+            <div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-mnac-accent" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-textPrimary">
+                  Itinerarios & Audioguías
+                </span>
+              </div>
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif italic leading-none mb-1.5 tracking-tight text-white">
+                Descubre el MNAC
+              </h1>
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-sans font-light leading-none tracking-tighter text-mnac-textPrimary">
+                a tu propio ritmo
+              </h1>
+            </div>
+
+            <button
+              onClick={() => {
+                hapticService.light();
+                setIsModalOpen(true);
+              }}
+              className="inline-flex items-center justify-between md:justify-center gap-3 w-full md:w-auto px-6 py-3.5 rounded-full bg-mnac-accent text-white font-bold text-xs uppercase tracking-[0.2em] active:scale-95 transition-transform shadow-[0_8px_24px_rgba(241,74,50,0.35)]"
+            >
+              <span className="flex items-center gap-2"><Sparkles size={16} /> Crear Ruta IA</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary">
+            <span>{TOURS_DATA.length} Rutas curadas disponibles</span>
+            <button
+              onClick={() => {
+                hapticService.light();
+                document.getElementById('catalog-start')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="hover:text-white active:scale-95 transition-all"
+            >
+              Ver catálogo ↓
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* CATALOG SECTION */}
+      <div id="catalog-start" className="max-w-[1920px] mx-auto px-5 sm:px-6 md:px-12 py-8 md:py-12">
         
-        <div className="relative z-10 text-center max-w-6xl px-6 animate-slide-up mt-10">
-           <div className="inline-block mb-6 relative group cursor-default">
-              <span className="text-mnac-gold text-xs md:text-sm font-bold uppercase tracking-[0.4em] relative z-10 pl-1 transition-colors duration-500 group-hover:text-white">
-                 Itinerarios & Rutas
+        {/* AI COMPACT CARD */}
+        <div
+          onClick={() => {
+            hapticService.light();
+            setIsModalOpen(true);
+          }}
+          className="mb-10 p-5 sm:p-7 rounded-2xl bg-mnac-surface border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer active:scale-[0.99] transition-transform"
+        >
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-mnac-accent/15 border border-mnac-accent/30 flex items-center justify-center text-mnac-accent shrink-0">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h2 className="font-serif italic text-xl sm:text-2xl text-white leading-tight">
+                ¿Buscas algo específico? <span className="font-sans font-light not-italic text-mnac-textSecondary">Pídeselo a Palau IA</span>
+              </h2>
+              <p className="text-xs text-mnac-textSecondary mt-1">
+                Genera una ruta personalizada según tu tiempo e intereses.
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-mnac-accent shrink-0">
+            Personalizar <ArrowRight size={14} />
+          </span>
+        </div>
+
+        {/* FILTER HEADER & HORIZONTAL PILLS */}
+        <div className="mb-8 space-y-4">
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
+                Selección Oficial
               </span>
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-mnac-gold/50 group-hover:w-1/2 transition-all duration-500"></div>
-           </div>
-           
-           <h1 className="font-serif text-5xl md:text-8xl text-white mb-8 leading-none drop-shadow-2xl">
-              <span className="italic block mb-2 font-light opacity-90">Descubre el MNAC</span>
-              <span className="not-italic font-bold tracking-tight">a tu propio ritmo</span>
-           </h1>
-           
-           <p className="text-gray-300 text-lg md:text-2xl font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md mb-12">
-             Desde recorridos exprés de 30 minutos hasta inmersiones profundas en el Románico. Elige tu camino.
-           </p>
+              <h2 className="font-serif italic text-2xl sm:text-3xl text-white tracking-tight">
+                Rutas Curadas
+              </h2>
+            </div>
+            <span className="text-[11px] text-mnac-textSecondary font-medium">
+              {filteredTours.length} {filteredTours.length === 1 ? 'ruta' : 'rutas'}
+            </span>
+          </div>
 
-           <button 
-             onClick={() => document.getElementById('catalog-start')?.scrollIntoView({ behavior: 'smooth' })}
-             className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 rounded-sm shadow-lg"
-           >
-              Ver Catálogo
-           </button>
-        </div>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 animate-bounce hidden md:flex flex-col items-center gap-2">
-             <span className="text-[9px] font-bold uppercase tracking-widest">Scroll</span>
-             <ChevronDown size={20} />
-        </div>
-      </div>
-
-      <div id="catalog-start" className="max-w-[1920px] mx-auto px-6 md:px-12 py-12 relative z-20">
-        
-        {/* AI MAGIC BANNER */}
-        <div className="relative -mt-32 mb-24 z-30">
-          <div 
-             onClick={() => setIsModalOpen(true)}
-             className="bg-[#1a1a1a] text-white rounded-sm p-8 md:p-12 shadow-2xl relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-2 border border-white/10"
-          >
-             {/* Background Effects */}
-             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-mnac-accent to-purple-900 rounded-full blur-[120px] opacity-10 group-hover:opacity-20 transition-opacity translate-x-1/2 -translate-y-1/2"></div>
-             <div className="absolute inset-0 opacity-10" style={{backgroundImage: `url("${IMAGES.tours.stardustTexture}")`}}></div>
-
-             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
-                <div className="flex-1">
-                   <div className="flex items-center gap-2 mb-6">
-                      <div className="bg-mnac-gold/20 p-2 rounded-lg backdrop-blur-md border border-mnac-gold/20">
-                         <Sparkles className="text-mnac-gold animate-pulse" size={20} />
-                      </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-mnac-gold">MNAC Intelligence</span>
-                   </div>
-                   <h2 className="font-serif text-3xl md:text-5xl mb-6 italic leading-tight">
-                      ¿No encuentras tu ruta ideal? <br/>
-                      <span className="not-italic font-light text-gray-300">Pídesela a Palau.</span>
-                   </h2>
-                   <p className="text-gray-400 font-light max-w-xl text-sm md:text-lg leading-relaxed">
-                      "Quiero una ruta de 20 minutos sobre dragones y espadas para niños". <br/>
-                      Nuestra IA generará un itinerario a medida con mapa y audioguía al instante.
-                   </p>
-                </div>
-                
-                <button className="bg-white text-black px-10 py-5 text-xs font-bold uppercase tracking-widest hover:bg-mnac-gold transition-colors shadow-2xl flex items-center gap-3 whitespace-nowrap z-20">
-                   <Sparkles size={16} /> Crear Ruta con IA
-                </button>
-             </div>
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 md:flex-wrap">
+            {TOUR_FILTERS.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => {
+                  hapticService.light();
+                  setActiveFilter(filter);
+                }}
+                className={`shrink-0 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest border active:scale-95 transition-all ${
+                  activeFilter === filter
+                    ? 'bg-mnac-accent text-white border-mnac-accent shadow-lg'
+                    : 'bg-mnac-surface text-mnac-textSecondary border-white/10 hover:border-white/25 hover:text-white'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* CATALOG SECTION */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-8 gap-6">
-           <div>
-              <h3 className="font-serif text-4xl text-white mb-3">Rutas Curadas</h3>
-              <p className="text-gray-500 text-base font-light">Selección oficial del equipo educativo del museo.</p>
-           </div>
-           
-           <div className="flex flex-wrap gap-2.5">
-              {['Todos', 'Highlights', 'Románico', 'Gótico', 'Renacimiento', 'Modernismo', 'Cortos'].map(filter => (
-                 <button 
-                   key={filter}
-                   onClick={() => setActiveFilter(filter)}
-                   className={`px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest border active:scale-95 transition-all ${
-                      activeFilter === filter 
-                      ? 'bg-mnac-accent text-white border-mnac-accent shadow-lg' 
-                      : 'bg-mnac-surface text-mnac-textSecondary border-white/15 hover:border-white hover:text-white'
-                   }`}
-                 >
-                    {filter}
-                 </button>
-              ))}
-           </div>
-        </div>
+        {/* TOURS GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
+          {filteredTours.map((tour) => (
+            <div
+              key={tour.id}
+              onClick={() => handleTourClick(tour.id)}
+              className="group bg-mnac-surface border border-white/10 hover:border-white/25 rounded-2xl overflow-hidden flex flex-col h-full cursor-pointer active:scale-[0.98] transition-all duration-300"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden bg-mnac-bg">
+                <OptimizedImage
+                  src={tour.coverImage}
+                  alt={tour.title}
+                  aspectRatio="h-full w-full"
+                  className="opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-mnac-surface via-transparent to-transparent" />
 
-        {/* TOURS GRID - DARK CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-32">
-           {filteredTours.map((tour) => (
-              <div 
-                key={tour.id} 
-                onClick={() => handleTourClick(tour.id)}
-                className="group bg-mnac-surface border border-white/5 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden rounded-sm"
-              >
-                 
-                 {/* Image */}
-                 <div className="relative h-72 overflow-hidden">
-                    <img 
-                       src={tour.coverImage} 
-                       alt={tour.title} 
-                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-mnac-surface via-transparent to-transparent"></div>
-                    
-                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
-                       {tour.duration} min
-                    </div>
-                    <div className="absolute bottom-4 left-4 flex gap-2">
-                       {tour.tags.slice(0, 2).map(tag => (
-                          <span key={tag} className="bg-white/10 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest shadow-sm">
-                             {tag}
-                          </span>
-                       ))}
-                    </div>
+                <div className="absolute top-3.5 right-3.5 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                  <Clock size={11} className="text-mnac-accent" /> {tour.duration} min
+                </div>
 
-                    {/* Play Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
-                        <div className="w-16 h-16 rounded-full bg-mnac-accent text-white flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-2xl">
-                            <Play size={32} fill="currentColor" className="ml-1" />
-                        </div>
-                    </div>
-                 </div>
+                <div className="absolute bottom-3.5 left-3.5 flex gap-2">
+                  {tour.tags.slice(0, 2).map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-black/60 backdrop-blur-md border border-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
 
-                 {/* Content */}
-                 <div className="p-8 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
-                       <h3 className="font-serif text-3xl text-white leading-none group-hover:text-mnac-accent transition-colors duration-300">
-                          {tour.title}
-                       </h3>
-                    </div>
-                    
-                    <p className="text-gray-400 text-sm font-light mb-8 line-clamp-3 flex-1 leading-relaxed">
-                       {tour.description}
-                    </p>
-
-                    <div className="flex items-center justify-between border-t border-white/10 pt-6 mt-auto">
-                       <div className="flex items-center gap-6 text-xs text-gray-500 font-bold uppercase tracking-wider">
-                          <span className="flex items-center gap-2"><Map size={16} className="text-white" /> {tour.stops.length} Paradas</span>
-                          <span className={`flex items-center gap-2 px-2 py-1 bg-white/5 rounded ${
-                             tour.difficulty === 'Baja' ? 'text-green-400' : 
-                             tour.difficulty === 'Media' ? 'text-yellow-400' : 'text-red-400'
-                          }`}>
-                             {tour.difficulty}
-                          </span>
-                       </div>
-                       
-                       <button className="w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-sm transform group-hover:rotate-[-45deg]">
-                          <ArrowRight size={20} />
-                       </button>
-                    </div>
-                 </div>
+                {/* Always-visible Play Button on Mobile */}
+                <div className="absolute bottom-3.5 right-3.5 w-11 h-11 rounded-full bg-mnac-accent text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Play size={18} fill="currentColor" className="ml-0.5" />
+                </div>
               </div>
-           ))}
-        </div>
 
+              <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                <h3 className="font-serif italic text-2xl sm:text-3xl text-white leading-tight mb-2 group-hover:text-mnac-accent transition-colors">
+                  {tour.title}
+                </h3>
+
+                <p className="text-mnac-textSecondary text-xs sm:text-sm font-light mb-6 line-clamp-2 flex-1 leading-relaxed">
+                  {tour.description}
+                </p>
+
+                <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-auto">
+                  <div className="flex items-center gap-3 text-[11px] text-mnac-textSecondary font-bold uppercase tracking-wider">
+                    <span className="flex items-center gap-1.5">
+                      <Map size={14} className="text-mnac-accent" /> {tour.stops.length} Paradas
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full bg-white/5 text-[10px] ${
+                        tour.difficulty === 'Baja'
+                          ? 'text-emerald-400'
+                          : tour.difficulty === 'Media'
+                          ? 'text-amber-400'
+                          : 'text-rose-400'
+                      }`}
+                    >
+                      {tour.difficulty}
+                    </span>
+                  </div>
+
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white group-hover:text-mnac-accent transition-colors">
+                    Iniciar <ArrowRight size={14} />
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
       <Footer role={userRole} />
     </div>
   );
