@@ -56,7 +56,7 @@ const QuizPage: React.FC = () => {
     <div className="h-[100dvh] w-full bg-mnac-cream flex flex-col md:flex-row overflow-hidden relative">
       
       {/* LEFT: Artwork Context */}
-      <div className="w-full md:w-1/3 h-1/3 md:h-full relative overflow-hidden bg-black flex-shrink-0">
+      <div className="w-full md:w-1/3 h-1/3 md:h-full relative overflow-hidden bg-mnac-bg flex-shrink-0">
         {currentArtwork ? (
            <>
              <img 
@@ -79,7 +79,7 @@ const QuizPage: React.FC = () => {
              </div>
            </>
         ) : (
-           <div className="w-full h-full bg-gray-900 animate-pulse"></div>
+           <div className="w-full h-full bg-mnac-surface animate-pulse"></div>
         )}
       </div>
 

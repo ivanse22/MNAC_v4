@@ -23,6 +23,7 @@ import { IMAGES } from '../data/images';
 import { ARTWORKS_DATA } from '../data/artworks';
 import { useGamification } from '../hooks/useGamification';
 import { hapticService } from '../services/hapticService';
+import QRScannerModal from '../components/QRScannerModal';
 
 interface HomePageProps {
   role: UserRole;
@@ -48,6 +49,24 @@ const FEATURED_SECTIONS = [
     image: IMAGES.artworks.jovenDecadente,
     link: "/tours?filter=Modernismo",
     desc: "De Gaudí a Picasso. La eclosión del arte moderno en Barcelona."
+  },
+  {
+    id: 3,
+    titleItalic: "Gothic",
+    titleNormal: "Splendor",
+    count: 540,
+    image: IMAGES.artworks.consagracionAgustin,
+    link: "/tours?filter=Gótico",
+    desc: "Retablos monumentales y pintura sobre tabla de la Corona de Aragón."
+  },
+  {
+    id: 4,
+    titleItalic: "Renaissance",
+    titleNormal: "& Baroque",
+    count: 418,
+    image: IMAGES.artworks.sanPedroPablo,
+    link: "/tours?filter=Renacimiento",
+    desc: "El Greco, Velázquez y Zurbarán en diálogo con la pintura europea."
   }
 ];
 
@@ -66,6 +85,7 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
   const { hash } = useLocation();
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showPwaBanner, setShowPwaBanner] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   useEffect(() => {
     if (!hash) window.scrollTo(0, 0);
@@ -177,18 +197,32 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
         <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
           {QUICK_ACTIONS.map((action) => {
             const Icon = action.icon;
+            if (action.label === 'Escanear') {
+              return (
+                <button
+                  key={action.label}
+                  type="button"
+                  onClick={() => {
+                    hapticService.light();
+                    setIsScannerOpen(true);
+                  }}
+                  className="flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-95 transition-all bg-mnac-accent/15 border-mnac-accent/40 text-white"
+                >
+                  <Icon size={20} className="text-mnac-accent" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">
+                    {action.label}
+                  </span>
+                </button>
+              );
+            }
             return (
               <Link
                 key={action.label}
                 to={action.to}
                 onClick={() => hapticService.light()}
-                className={`flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-95 transition-all ${
-                  action.accent
-                    ? 'bg-mnac-accent/15 border-mnac-accent/40 text-white'
-                    : 'bg-mnac-surface border-white/10 text-mnac-textPrimary hover:border-white/25'
-                }`}
+                className="flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-95 transition-all bg-mnac-surface border-white/10 text-mnac-textPrimary hover:border-white/25"
               >
-                <Icon size={20} className={action.accent ? 'text-mnac-accent' : 'text-mnac-secondary'} />
+                <Icon size={20} className="text-mnac-secondary" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">
                   {action.label}
                 </span>
@@ -383,6 +417,7 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
       </section>
 
       <Footer role={role} />
+      <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
     </div>
   );
 };

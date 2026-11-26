@@ -231,7 +231,7 @@ const VisitPage: React.FC<VisitPageProps> = ({ role }) => {
                    ))}
                  </div>
 
-                 <button className="w-full bg-mnac-accent hover:bg-white hover:text-black py-5 text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4 group">
+                 <button className="w-full bg-mnac-accent hover:opacity-90 active:scale-95 rounded-full py-4 text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4 group text-white">
                     Comprar Entradas <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
                  </button>
                  <p className="text-center text-[8px] text-gray-500 uppercase tracking-widest mt-6 font-bold italic">
