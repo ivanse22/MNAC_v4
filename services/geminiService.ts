@@ -51,9 +51,24 @@ function writeString(view: DataView, offset: number, string: string) {
 
 // --- SECURE API CALLING ---
 
+export type TtsVoiceName = 'Aoede' | 'Charon' | 'Leda';
+
+export const TTS_VOICES: { id: TtsVoiceName; label: string; desc: string }[] = [
+  { id: 'Aoede', label: 'Guía Cálida', desc: 'Cercana y narrativa' },
+  { id: 'Charon', label: 'Documental', desc: 'Pausada y profunda' },
+  { id: 'Leda', label: 'Clara', desc: 'Ágil y luminosa' }
+];
+
+const getClientApiKey = (): string | undefined => {
+  const viteKey = (import.meta as any)?.env?.VITE_GEMINI_API_KEY;
+  if (viteKey) return viteKey;
+  if (typeof process !== 'undefined' && process.env?.API_KEY) return process.env.API_KEY;
+  return undefined;
+};
+
 /**
  * Intenta llamar a la Edge Function de Supabase para ocultar la API Key.
- * Si falla o no está configurado, hace fallback a la llamada local (solo para desarrollo).
+ * Si falla o no está configurado, hace fallback a la llamada local (si hay clave configurada).
  */
 const invokeAI = async (functionName: string, payload: any): Promise<any> => {
   // 1. Try Supabase Edge Function (PROD SECURE WAY)
@@ -69,14 +84,15 @@ const invokeAI = async (functionName: string, payload: any): Promise<any> => {
     }
   }
 
-  // 2. Fallback: Client Side Call (DEV ONLY - Unsafe for Prod)
-  // Re-instantiate local client just for fallback
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // 2. Fallback: Client Side Call (only if API key is present)
+  const apiKey = getClientApiKey();
+  if (!apiKey) return null;
+
+  const ai = new GoogleGenAI({ apiKey });
   
   if (functionName === 'mnac-chat') {
-    // Replicate chat logic locally
     const chat = ai.chats.create({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         config: { responseMimeType: "application/json" },
         history: payload.history
     });
@@ -86,23 +102,25 @@ const invokeAI = async (functionName: string, payload: any): Promise<any> => {
   
   if (functionName === 'mnac-tour-script') {
      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: payload.prompt
      });
      return { text: response.text };
   }
 
   if (functionName === 'mnac-tts') {
+      const voiceName: TtsVoiceName = payload.voiceName || 'Aoede';
+      const directedPrompt = `Lee el siguiente guion de audioguía de museo en español con un tono cálido, humano, pausado y envolvente, respetando pausas naturales entre ideas:\n\n${payload.text}`;
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
-        contents: [{ parts: [{ text: payload.text }] }],
+        contents: [{ parts: [{ text: directedPrompt }] }],
         config: {
             responseModalities: [Modality.AUDIO],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
         },
       });
       const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      return { audioData };
+      return { audioData, model: 'gemini-2.5-flash-preview-tts', voiceName };
   }
 
   return null;
@@ -132,22 +150,22 @@ export const generateArtGuideResponse = async (
 
 export const generateTourScript = async (artwork: ArtWork, role: UserRole): Promise<string> => {
   try {
-    // Construct prompt here to keep logic in frontend, but send prompt to backend
-    const basePrompt = `Analiza la obra "${artwork.title}" de ${artwork.artist}. 
-    ROL: ${role === 'student' ? 'Guía dinámico para jóvenes' : 'Curador experto'}.
-    IDIOMA: Español. 
-    ESTILO: Narrativo sin markdown.`;
+    const basePrompt = `Eres guía oficial del Museu Nacional d'Art de Catalunya (MNAC). 
+    Narra la obra "${artwork.title}" de ${artwork.artist} (${artwork.year}, periodo ${artwork.period}).
+    CONTEXTO: ${artwork.description}
+    AUDIENCIA: ${role === 'student' ? 'Joven curioso, lenguaje cercano y visual' : role === 'teacher' ? 'Docente, enfoque contextual y pedagógico' : 'Visitante del museo, tono cálido, elegante y envolvente'}.
+    REGLAS: Máximo 75 palabras en español natural para ser leído en voz alta, sin markdown, sin comillas ni listas, con pausas naturales.`;
 
     const data = await invokeAI('mnac-tour-script', { prompt: basePrompt });
-    return data?.text || artwork.description;
-  } catch (error) {
+    return data?.text?.trim() || artwork.description;
+  } catch {
     return artwork.description;
   }
 };
 
-export const textToSpeech = async (text: string): Promise<string | null> => {
+export const textToSpeech = async (text: string, voiceName: TtsVoiceName = 'Aoede'): Promise<string | null> => {
   try {
-    const data = await invokeAI('mnac-tts', { text });
+    const data = await invokeAI('mnac-tts', { text, voiceName });
     if (data?.audioData) {
       const pcmBuffer = base64ToArrayBuffer(data.audioData);
       const wavBlob = createWavFile(pcmBuffer);

@@ -31,6 +31,7 @@ interface HairlineMuseumMapProps {
   pan: { x: number; y: number };
   onPanChange: (next: { x: number; y: number }) => void;
   showRoute: boolean;
+  tourRoutePoints?: { id: string; level: 0 | 1; x: number; y: number }[];
 }
 
 type Vec2 = [number, number];
@@ -157,7 +158,8 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
   onScaleChange,
   pan,
   onPanChange,
-  showRoute
+  showRoute,
+  tourRoutePoints
 }) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -510,6 +512,30 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                       </circle>
                       <circle cx={originScreen[0]} cy={originScreen[1]} r="2.8" fill="#D1CCBF" />
                     </g>
+
+                    {/* Sequential Guided Tour Path (when inside TourPlayer) */}
+                    {tourRoutePoints && (() => {
+                      const floorStops = tourRoutePoints.filter((s) => s.level === level);
+                      if (floorStops.length < 2) return null;
+                      const pathD = floorStops
+                        .map((s, idx) => {
+                          const [sx, sy] = P(s.x, s.y, zBase + 1.5);
+                          return `${idx === 0 ? 'M' : 'L'}${sx},${sy}`;
+                        })
+                        .join(' ');
+                      return (
+                        <path
+                          d={pathD}
+                          fill="none"
+                          stroke="#D1CCBF"
+                          strokeWidth="1.2"
+                          strokeDasharray="2 3"
+                          opacity="0.55"
+                          vectorEffect="non-scaling-stroke"
+                          strokeLinecap="round"
+                        />
+                      );
+                    })()}
 
                     {/* Animated Dashed Hairline Route to Selected Room */}
                     {showRoute && selectedInFloor && (
