@@ -523,7 +523,7 @@ const MapPage: React.FC<MapPageProps> = () => {
 
       {/* --- FLOATING CONTROLS DOCK (HIDDEN ON MOBILE WHEN ROOM CARD IS OPEN SO IT NEVER COLLIDES) --- */}
       <div
-        className={`fixed left-1/2 -translate-x-1/2 z-20 items-center gap-2 bg-mnac-surface/95 backdrop-blur-xl shadow-2xl rounded-full p-1.5 border border-white/15 bottom-28 md:bottom-8 transition-all ${
+        className={`fixed left-1/2 -translate-x-1/2 z-20 items-center gap-1.5 sm:gap-2 max-w-[calc(100%-1.5rem)] bg-mnac-surface/95 backdrop-blur-xl shadow-2xl rounded-full p-1.5 border border-white/15 bottom-36 md:bottom-8 transition-all ${
           selectedRoom ? 'hidden md:flex' : 'flex'
         }`}
       >
@@ -598,9 +598,9 @@ const MapPage: React.FC<MapPageProps> = () => {
         </button>
       </div>
 
-      {/* --- ROOM DETAIL CARD (FLOATS ABOVE BOTTOM NAVIGATION ON MOBILE SO ZERO OVERLAP) --- */}
+      {/* --- ROOM DETAIL CARD (FLOATS CLEANLY ABOVE BOTTOM NAVIGATION + SCANNER BUTTON ON MOBILE) --- */}
       <div
-        className={`fixed z-30 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] bg-mnac-surface/95 backdrop-blur-xl shadow-2xl bottom-28 left-3 right-3 rounded-3xl border border-white/15 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
+        className={`fixed z-30 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] bg-mnac-surface/95 backdrop-blur-xl shadow-2xl bottom-36 left-3 right-3 rounded-3xl border border-white/15 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
           selectedRoom ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-[130%] opacity-0 pointer-events-none'
         }`}
       >
