@@ -35,6 +35,7 @@ import TimelinePage from './pages/TimelinePage';
 import AuthorsPage from './pages/AuthorsPage';
 import MapPage from './pages/MapPage';
 import AccessibilityPage from './pages/AccessibilityPage';
+import TicketsPage from './pages/TicketsPage';
 
 const App: React.FC = () => {
   // Use Real Auth Hook instead of local state only
@@ -255,6 +256,7 @@ const App: React.FC = () => {
           <Route path="/visit" element={<VisitPage role={userRole} />} />
           <Route path="/visit/map" element={<MapPage userRole={userRole} />} />
           <Route path="/visit/accessibility" element={<AccessibilityPage userRole={userRole} />} />
+          <Route path="/tickets" element={<TicketsPage userRole={userRole} />} />
 
           {/* --- ÁREA PERSONAL --- */}
           <Route path="/collections" element={<TeacherCollectionsPage savedArtIds={savedArtIds} onToggleSave={handleToggleSave} />} />

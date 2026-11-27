@@ -92,7 +92,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
 
   const getPersonalSpaceLink = () => {
     if (role === 'teacher') return '/collections';
-    if (role === 'visitor') return '/visit#tickets';
+    if (role === 'visitor') return '/tickets';
     return '/saved';
   };
 
@@ -212,9 +212,9 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
               <NavItem 
                 to={getPersonalSpaceLink()} 
                 icon={getPersonalSpaceIcon()} 
-                isActive={isActive('/saved') || isActive('/collections') || (role === 'visitor' && isActive('/visit'))} 
+                isActive={isActive('/saved') || isActive('/collections') || (role === 'visitor' && isActive('/tickets'))} 
                 onClick={handleTabClick} 
-                label="Perfil"
+                label={role === 'visitor' ? 'Tickets' : 'Perfil'}
               />
             </div>
 

@@ -123,8 +123,8 @@ const NavigationOverlays: React.FC<NavigationProps> = ({
 
                  {role === 'visitor' && (
                    <MenuLink 
-                      to="/visit#tickets" 
-                      label="Mis Entradas" 
+                      to="/tickets" 
+                      label="Mis Tickets" 
                       onClose={onClose} 
                       icon={<Ticket size={18} />} 
                    />
