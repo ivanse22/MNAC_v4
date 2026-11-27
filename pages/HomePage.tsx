@@ -139,11 +139,11 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
                   Museu Nacional · Abierto hoy
                 </span>
               </div>
-              <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif italic leading-none mb-1.5 tracking-tight">
-                {content.hero.titleItalic}
-              </h1>
-              <h1 className="text-4xl sm:text-6xl md:text-8xl font-sans font-light leading-none tracking-tighter">
-                {content.hero.titleNormal}
+              <h1 className="text-[2.25rem] sm:text-5xl md:text-8xl font-serif italic leading-none tracking-tight whitespace-nowrap md:whitespace-normal">
+                {content.hero.titleItalic}{' '}
+                <span className="font-sans font-light not-italic tracking-tighter md:block md:mt-1.5">
+                  {content.hero.titleNormal}
+                </span>
               </h1>
             </div>
 
