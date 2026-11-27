@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserRole } from '../types';
 import { TOURS_DATA } from '../data/tours';
+import { ARTWORKS_DATA } from '../data/artworks';
 import { generateCustomItinerary } from '../services/geminiService';
 import { Map, ArrowRight, Sparkles, Play, X, Loader2, Clock } from 'lucide-react';
 import Footer from '../components/Footer';
@@ -250,7 +251,12 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
 
         {/* TOURS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
-          {filteredTours.map((tour) => (
+          {filteredTours.map((tour) => {
+            const stopArtworks = tour.stops
+              .map((stopId) => ARTWORKS_DATA.find((a) => a.id === stopId))
+              .filter((a): a is NonNullable<typeof a> => Boolean(a));
+
+            return (
             <div
               key={tour.id}
               onClick={() => handleTourClick(tour.id)}
@@ -291,9 +297,33 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
                   {tour.title}
                 </h3>
 
-                <p className="text-mnac-textSecondary text-xs sm:text-sm font-light mb-6 line-clamp-2 flex-1 leading-relaxed">
+                <p className="text-mnac-textSecondary text-xs sm:text-sm font-light mb-5 line-clamp-2 flex-1 leading-relaxed">
                   {tour.description}
                 </p>
+
+                {/* Selected Artworks Preview */}
+                {stopArtworks.length > 0 && (
+                  <div className="mb-5 p-3 rounded-xl bg-mnac-bg/70 border border-white/5 flex items-center gap-3">
+                    <div className="flex -space-x-2 shrink-0">
+                      {stopArtworks.slice(0, 3).map((art) => (
+                        <img
+                          key={art.id}
+                          src={art.imageUrl}
+                          alt={art.title}
+                          className="w-8 h-8 rounded-full object-cover border-2 border-mnac-surface"
+                        />
+                      ))}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-[9px] font-bold uppercase tracking-widest text-mnac-accent">
+                        Obras seleccionadas
+                      </span>
+                      <p className="text-[11px] text-mnac-textPrimary truncate">
+                        {stopArtworks.map((a) => a.title).join(' · ')}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-auto">
                   <div className="flex items-center gap-3 text-[11px] text-mnac-textSecondary font-bold uppercase tracking-wider">
@@ -319,7 +349,8 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
