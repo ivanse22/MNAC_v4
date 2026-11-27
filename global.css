@@ -70,6 +70,43 @@ h1, h2, h3, .font-display {
   color: #FFFFFF;
 }
 
+@keyframes mnacBookmarkPop {
+  0% { transform: scale(0.84); }
+  55% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes mnacCrossfade {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mnacModalIn {
+  0% { opacity: 0; transform: scale(0.96) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes mnacStaggerIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-bookmark-pop {
+  animation: mnacBookmarkPop 260ms var(--ease-out);
+}
+
+.animate-crossfade {
+  animation: mnacCrossfade 200ms var(--ease-out) both;
+}
+
+.animate-modal-in {
+  animation: mnacModalIn 240ms var(--ease-out) both;
+}
+
+.animate-stagger {
+  animation: mnacStaggerIn 340ms var(--ease-out) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -576,8 +576,15 @@ const MapPage: React.FC<MapPageProps> = () => {
           selectedRoom ? 'hidden md:flex' : 'flex'
         }`}
       >
-        {/* 2-Level MNAC Switcher */}
-        <div className="flex items-center bg-mnac-bg rounded-full p-1 gap-1">
+        {/* 2-Level MNAC Switcher with Sliding Pill */}
+        <div className="relative grid grid-cols-2 bg-mnac-bg rounded-full p-1 gap-1">
+          <div
+            aria-hidden="true"
+            className="absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-mnac-accent shadow transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-none"
+            style={{
+              transform: activeLevel === 0 ? 'translateX(0%)' : 'translateX(100%)'
+            }}
+          />
           {([0, 1] as const).map((lvl) => (
             <button
               key={lvl}
@@ -585,9 +592,9 @@ const MapPage: React.FC<MapPageProps> = () => {
                 hapticService.light();
                 setActiveLevel(lvl);
               }}
-              className={`min-h-[40px] px-4 rounded-full text-xs font-bold transition-all active:scale-95 whitespace-nowrap ${
+              className={`relative z-10 min-h-[40px] px-4 rounded-full text-xs font-bold transition-colors duration-150 active:scale-95 whitespace-nowrap ${
                 activeLevel === lvl
-                  ? 'bg-mnac-accent text-white shadow'
+                  ? 'text-white'
                   : 'text-mnac-textSecondary hover:text-white'
               }`}
             >
@@ -735,7 +742,7 @@ const MapPage: React.FC<MapPageProps> = () => {
 
             {/* Step-by-step Wayfinding Directions */}
             {showRoute && (
-              <div className="p-3.5 rounded-2xl bg-mnac-bg/90 border border-mnac-accent/40 space-y-1.5 animate-fade-in">
+              <div className="p-3.5 rounded-2xl bg-mnac-bg/90 border border-mnac-accent/40 space-y-1.5 animate-crossfade">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-mnac-accent block">
                   Cómo llegar · {selectedRoom.walkTime}
                 </span>

@@ -41,7 +41,12 @@ const ArtCard: React.FC<ArtCardProps> = ({ artwork, isSaved, onToggleSave }) => 
               : 'bg-black/50 backdrop-blur-md text-white hover:bg-white hover:text-black'
           }`}
         >
-          <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
+          <Bookmark
+            key={isSaved ? 'saved' : 'unsaved'}
+            size={16}
+            fill={isSaved ? 'currentColor' : 'none'}
+            className={isSaved ? 'animate-bookmark-pop' : ''}
+          />
         </button>
       </Link>
       

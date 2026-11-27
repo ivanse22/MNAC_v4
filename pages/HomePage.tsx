@@ -192,18 +192,21 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
         </Link>
 
         <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
-          {QUICK_ACTIONS.map((action) => {
+          {QUICK_ACTIONS.map((action, idx) => {
             const Icon = action.icon;
+            const staggerDelays = [0, 35, 65, 90];
+            const delayStyle = { animationDelay: `${staggerDelays[idx] ?? 0}ms` };
             if (action.label === 'Escanear') {
               return (
                 <button
                   key={action.label}
                   type="button"
+                  style={delayStyle}
                   onClick={() => {
                     hapticService.light();
                     setIsScannerOpen(true);
                   }}
-                  className="flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-95 transition-all bg-mnac-accent/15 border-mnac-accent/40 text-white"
+                  className="animate-stagger flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-[0.96] transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] bg-mnac-accent/15 border-mnac-accent/40 text-white"
                 >
                   <Icon size={20} className="text-mnac-accent" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">
@@ -216,8 +219,9 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
               <Link
                 key={action.label}
                 to={action.to}
+                style={delayStyle}
                 onClick={() => hapticService.light()}
-                className="flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-95 transition-all bg-mnac-surface border-white/10 text-mnac-textPrimary hover:border-white/25"
+                className="animate-stagger flex flex-col items-center justify-center gap-2 py-3.5 px-2 rounded-2xl border active:scale-[0.96] transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] bg-mnac-surface border-white/10 text-mnac-textPrimary hover:border-white/25"
               >
                 <Icon size={20} className="text-mnac-secondary" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight">

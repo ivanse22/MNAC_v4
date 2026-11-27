@@ -257,17 +257,24 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
         {/* ACQUISITION FLOW WITH CLEAN SEGMENTED TABS */}
         {showAcquisitionMode && (
           <section className="max-w-2xl mx-auto w-full space-y-6 animate-fade-in">
-            {/* Segmented Pill Tabs */}
-            <div className="grid grid-cols-2 p-1.5 rounded-full bg-mnac-surface border border-white/10">
+            {/* Segmented Pill Tabs with Sliding Indicator */}
+            <div className="relative grid grid-cols-2 p-1.5 rounded-full bg-mnac-surface border border-white/10">
+              <div
+                aria-hidden="true"
+                className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-0.375rem)] rounded-full bg-mnac-accent shadow-lg transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-none"
+                style={{
+                  transform: activeTab === 'online' ? 'translateX(0%)' : 'translateX(100%)'
+                }}
+              />
               <button
                 type="button"
                 onClick={() => {
                   hapticService.light();
                   setActiveTab('online');
                 }}
-                className={`py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`relative z-10 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-colors duration-150 ${
                   activeTab === 'online'
-                    ? 'bg-mnac-accent text-white shadow-lg'
+                    ? 'text-white'
                     : 'text-mnac-textSecondary hover:text-white'
                 }`}
               >
@@ -279,9 +286,9 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
                   hapticService.light();
                   setActiveTab('museum');
                 }}
-                className={`py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`relative z-10 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-colors duration-150 ${
                   activeTab === 'museum'
-                    ? 'bg-mnac-accent text-white shadow-lg'
+                    ? 'text-white'
                     : 'text-mnac-textSecondary hover:text-white'
                 }`}
               >
@@ -292,8 +299,9 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
             {/* TAB 1: BUY ONLINE */}
             {activeTab === 'online' && (
               <form
+                key="tab-online"
                 onSubmit={handleConfirmPurchase}
-                className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6"
+                className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-crossfade"
               >
                 <div>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
@@ -428,7 +436,7 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
 
             {/* TAB 2: BUY AT THE MUSEUM */}
             {activeTab === 'museum' && (
-              <div className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-fade-in">
+              <div key="tab-museum" className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-crossfade">
                 <div>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
                     Taquillas del Museo

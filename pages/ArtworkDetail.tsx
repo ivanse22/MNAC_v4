@@ -214,13 +214,18 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
               onToggleSave(artwork.id);
             }}
             aria-label="Guardar obra"
-            className={`p-3 rounded-full backdrop-blur-md shadow-lg border active:scale-95 transition-all ${
+            className={`p-3 rounded-full backdrop-blur-md shadow-lg border active:scale-90 transition-[transform,background-color,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] ${
               isSaved
                 ? 'bg-mnac-accent border-mnac-accent text-white'
                 : 'bg-black/60 border-white/15 text-white hover:border-white'
             }`}
           >
-            <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
+            <Bookmark
+              key={isSaved ? 'top-saved' : 'top-unsaved'}
+              size={18}
+              fill={isSaved ? 'currentColor' : 'none'}
+              className={isSaved ? 'animate-bookmark-pop' : ''}
+            />
           </button>
         </div>
       </div>
@@ -265,16 +270,23 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
               {artwork.artist}
             </p>
 
-            {/* Quick Reading Mode Toggle (Visitor) */}
+            {/* Quick Reading Mode Toggle with Sliding Pill (Visitor) */}
             {userRole !== 'teacher' && (
-              <div className="inline-flex self-start p-1 rounded-full bg-mnac-surface border border-white/10 mb-5">
+              <div className="relative inline-grid grid-cols-2 self-start p-1 rounded-full bg-mnac-surface border border-white/10 mb-5">
+                <div
+                  aria-hidden="true"
+                  className="absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-mnac-accent transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-none"
+                  style={{
+                    transform: !useSimpleText ? 'translateX(0%)' : 'translateX(100%)'
+                  }}
+                />
                 <button
                   onClick={() => {
                     hapticService.light();
                     setUseSimpleText(false);
                   }}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                    !useSimpleText ? 'bg-mnac-accent text-white' : 'text-mnac-textSecondary hover:text-white'
+                  className={`relative z-10 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors duration-150 text-center ${
+                    !useSimpleText ? 'text-white' : 'text-mnac-textSecondary hover:text-white'
                   }`}
                 >
                   Curatorial
@@ -284,8 +296,8 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
                     hapticService.light();
                     setUseSimpleText(true);
                   }}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-                    useSimpleText ? 'bg-mnac-accent text-white' : 'text-mnac-textSecondary hover:text-white'
+                  className={`relative z-10 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors duration-150 ${
+                    useSimpleText ? 'text-white' : 'text-mnac-textSecondary hover:text-white'
                   }`}
                 >
                   <BookOpen size={11} /> Lectura Fácil
@@ -293,7 +305,10 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
               </div>
             )}
 
-            <p className="text-mnac-textPrimary/90 leading-relaxed mb-6 text-base sm:text-lg font-light max-w-2xl">
+            <p
+              key={useSimpleText ? 'simple' : 'curatorial'}
+              className="text-mnac-textPrimary/90 leading-relaxed mb-6 text-base sm:text-lg font-light max-w-2xl animate-crossfade"
+            >
               {activeDescription}
             </p>
 

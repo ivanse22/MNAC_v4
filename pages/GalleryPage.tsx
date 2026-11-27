@@ -336,7 +336,7 @@ const GalleryPage: React.FC<GalleryPageProps> = ({
 
         {/* DYNAMIC PERIOD CURATORIAL CONTEXT + QUICK REFERENCE LINKS */}
         <div className="mb-8 space-y-4">
-          <div className="p-5 sm:p-6 rounded-2xl bg-mnac-surface border border-white/10">
+          <div key={periodFilter} className="p-5 sm:p-6 rounded-2xl bg-mnac-surface border border-white/10 animate-crossfade">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
               <div className="flex items-center gap-2.5">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent">
@@ -395,14 +395,19 @@ const GalleryPage: React.FC<GalleryPageProps> = ({
         {/* CURATORIAL ARTWORKS GRID (2 COLS ON MOBILE, 4 ON DESKTOP) */}
         {filteredArtworks.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6 pb-12">
-            {filteredArtworks.map((artwork) => (
-              <ArtCard
-                key={artwork.id}
-                artwork={artwork}
-                isSaved={savedArtIds.includes(artwork.id)}
-                onToggleSave={() => onToggleSave(artwork.id)}
-              />
-            ))}
+            {filteredArtworks.map((artwork, idx) => {
+              const staggerDelays = [0, 35, 65, 90, 110, 125];
+              const delay = idx < staggerDelays.length ? staggerDelays[idx] : 140;
+              return (
+                <div key={artwork.id} className="animate-stagger" style={{ animationDelay: `${delay}ms` }}>
+                  <ArtCard
+                    artwork={artwork}
+                    isSaved={savedArtIds.includes(artwork.id)}
+                    onToggleSave={() => onToggleSave(artwork.id)}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="py-16 px-6 rounded-2xl bg-mnac-surface border border-white/10 text-center flex flex-col items-center animate-fade-in">

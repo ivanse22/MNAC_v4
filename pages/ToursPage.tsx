@@ -75,7 +75,7 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
             onClick={() => !isGenerating && setIsModalOpen(false)}
           />
           
-          <div className="bg-mnac-surface w-full max-w-lg rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden animate-pop-in">
+          <div className="bg-mnac-surface w-full max-w-lg rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden animate-modal-in">
             <div className="p-6 sm:p-8">
               <div className="flex justify-between items-start mb-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mnac-accent/15 border border-mnac-accent/30 text-mnac-accent">
