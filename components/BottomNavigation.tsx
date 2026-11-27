@@ -102,8 +102,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
     <>
       {/* --- QUICK ACTION MENU (CONTEXTUAL) --- */}
       <div 
-        className={`fixed z-[95] bottom-28 left-1/2 -translate-x-1/2 flex gap-4 transition-all duration-300 ${
-          showScannerMenu ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-10 scale-90 pointer-events-none'
+        className={`fixed z-[95] bottom-28 left-1/2 -translate-x-1/2 flex gap-4 transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          showScannerMenu ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
         }`}
       >
          <button className="flex flex-col items-center gap-2 group" onClick={() => { setShowScannerMenu(false); }}>
@@ -177,7 +177,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
                   onMouseUp={handleScannerPressEnd}
                   onTouchStart={handleScannerPressStart}
                   onTouchEnd={handleScannerPressEnd}
-                  className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 group relative active:scale-90"
+                  className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group relative active:scale-[0.93]"
                   style={{
                     backgroundColor: '#F14A32', // MNAC Vermilion
                     boxShadow: '0 8px 25px rgba(241, 74, 50, 0.5), inset 0 2px 4px rgba(255,255,255,0.3)',
@@ -234,19 +234,19 @@ const NavItem = ({ to, icon, isActive, onClick, label }: { to: string, icon: Rea
   >
     {/* Active "Lava Lamp" Glow */}
     <div 
-        className={`absolute inset-0 bg-mnac-secondary/10 rounded-2xl blur-md transition-all duration-500 ease-out ${
-            isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+        className={`absolute inset-0 bg-mnac-secondary/10 rounded-2xl blur-md transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+            isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`}
     ></div>
 
-    <div className={`relative z-10 transition-all duration-300 ${isActive ? 'text-mnac-secondary -translate-y-1' : 'text-mnac-secondary/50 group-hover:text-mnac-secondary'}`}>
+    <div className={`relative z-10 transition-[transform,color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-active:scale-90 ${isActive ? 'text-mnac-secondary -translate-y-1' : 'text-mnac-secondary/50 group-hover:text-mnac-secondary'}`}>
       {React.cloneElement(icon as React.ReactElement<any>, { 
         strokeWidth: isActive ? 2.5 : 1.5
       })}
     </div>
     
     {/* Tiny Label on Active */}
-    <span className={`absolute bottom-1 text-[9px] font-bold uppercase tracking-wider text-mnac-secondary transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+    <span className={`absolute bottom-1 text-[9px] font-bold uppercase tracking-wider text-mnac-secondary transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
         {label}
     </span>
   </Link>

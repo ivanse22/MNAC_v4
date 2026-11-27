@@ -23,21 +23,22 @@ const ArtCard: React.FC<ArtCardProps> = ({ artwork, isSaved, onToggleSave }) => 
   return (
     <div className="group flex flex-col h-full relative mb-8">
       {/* Image Container - Clean Edge */}
-      <Link to={`/artwork/${artwork.id}`} className="block relative w-full aspect-[3/4] overflow-hidden bg-mnac-surface mb-4">
+      <Link to={`/artwork/${artwork.id}`} className="block relative w-full aspect-[3/4] overflow-hidden bg-mnac-surface rounded-2xl border border-white/10 mb-3.5 active:scale-[0.98] transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]">
         <OptimizedImage 
           src={artwork.imageUrl} 
           alt={artwork.title} 
           aspectRatio="h-full w-full"
-          className="transition-transform duration-1000 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
+          className="transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-105 opacity-90 group-hover:opacity-100"
         />
         
         {/* Floating Action Button (FAB) Style for Save */}
         <button 
           onClick={handleSaveClick}
-          className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${
+          aria-label={isSaved ? 'Quitar de guardados' : 'Guardar obra'}
+          className={`absolute top-3 right-3 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-90 ${
             isSaved 
-              ? 'bg-mnac-accent text-white shadow-[0_0_15px_rgba(255,77,40,0.5)]' 
-              : 'bg-black/40 backdrop-blur-md text-white hover:bg-white hover:text-black'
+              ? 'bg-mnac-accent text-white shadow-[0_0_15px_rgba(241,74,50,0.45)]' 
+              : 'bg-black/50 backdrop-blur-md text-white hover:bg-white hover:text-black'
           }`}
         >
           <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />

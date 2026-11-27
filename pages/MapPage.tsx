@@ -297,6 +297,9 @@ const MapPage: React.FC<MapPageProps> = () => {
   const [showStructureGuide, setShowStructureGuide] = useState(false);
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [cardDragY, setCardDragY] = useState(0);
+  const [isDraggingCard, setIsDraggingCard] = useState(false);
+  const cardDragRef = React.useRef<{ startY: number; startTime: number }>({ startY: 0, startTime: 0 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -639,12 +642,45 @@ const MapPage: React.FC<MapPageProps> = () => {
         </div>
       </div>
 
-      {/* --- ROOM DETAIL CARD (FLOATS CLEANLY ABOVE BOTTOM NAVIGATION + SCANNER BUTTON ON MOBILE) --- */}
+      {/* --- ROOM DETAIL CARD (1:1 SWIPE-TO-DISMISS + FLOATS ABOVE DOCK) --- */}
       <div
-        className={`fixed z-30 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] bg-mnac-surface/95 backdrop-blur-xl shadow-2xl bottom-36 left-3 right-3 rounded-3xl border border-white/15 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
-          selectedRoom ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-[130%] opacity-0 pointer-events-none'
+        onTouchStart={(e) => {
+          if ((e.target as HTMLElement).closest('button, a')) return;
+          setIsDraggingCard(true);
+          cardDragRef.current = { startY: e.touches[0].clientY, startTime: performance.now() };
+        }}
+        onTouchMove={(e) => {
+          if (!isDraggingCard) return;
+          const dy = e.touches[0].clientY - cardDragRef.current.startY;
+          // Elastic resistance when pulling up, 1:1 tracking when pulling down
+          setCardDragY(dy < 0 ? dy * 0.18 : dy);
+        }}
+        onTouchEnd={() => {
+          if (!isDraggingCard) return;
+          setIsDraggingCard(false);
+          const elapsed = Math.max(performance.now() - cardDragRef.current.startTime, 1);
+          const velocity = (cardDragY / elapsed) * 1000;
+          if (cardDragY > 75 || velocity > 450) {
+            hapticService.light();
+            setSelectedRoomId(null);
+            setShowRoute(false);
+          }
+          setCardDragY(0);
+        }}
+        style={{
+          transform: selectedRoom
+            ? `translateY(${cardDragY}px)`
+            : 'translateY(calc(100% + 140px))',
+          transition: isDraggingCard
+            ? 'none'
+            : 'transform 380ms cubic-bezier(0.32, 0.72, 0, 1), opacity 240ms cubic-bezier(0.23, 1, 0.32, 1)'
+        }}
+        className={`fixed z-30 bg-mnac-surface/95 backdrop-blur-xl shadow-2xl bottom-36 left-3 right-3 rounded-3xl border border-white/15 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
+          selectedRoom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
+        {/* Subtle Drag Handle on Mobile */}
+        <div className="md:hidden w-9 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
         {selectedRoom && (
           <div className="relative p-4 sm:p-5 space-y-4">
             <button

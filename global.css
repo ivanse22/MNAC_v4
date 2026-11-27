@@ -6,6 +6,15 @@
 
 :root {
   color-scheme: dark;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }
 
 body {
@@ -15,17 +24,26 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* NATIVE APP FEEL CSS */
-  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  overscroll-behavior-y: none;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Eliminate 300ms mobile tap delay & prevent accidental text selection on UI controls */
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent iOS Safari from auto-zooming on inputs under 16px */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 h1, h2, h3, .font-display {
@@ -50,4 +68,15 @@ h1, h2, h3, .font-display {
 ::selection {
   background-color: #F14A32;
   color: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
