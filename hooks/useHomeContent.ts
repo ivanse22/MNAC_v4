@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { UserRole, HomeContentConfig } from '../types';
-import { STUDENT_HOME_CONTENT, TEACHER_HOME_CONTENT } from '../data/homeContent';
+import { STUDENT_HOME_CONTENT, TEACHER_HOME_CONTENT, VISITOR_HOME_CONTENT } from '../data/homeContent';
 
 export const useHomeContent = (role: UserRole) => {
   
@@ -9,7 +9,9 @@ export const useHomeContent = (role: UserRole) => {
     if (role === 'teacher') {
       return TEACHER_HOME_CONTENT;
     }
-    // Default to student content if role is student or null (fallback)
+    if (role === 'visitor') {
+      return VISITOR_HOME_CONTENT;
+    }
     return STUDENT_HOME_CONTENT;
   }, [role]);
 

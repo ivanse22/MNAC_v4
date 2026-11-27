@@ -54,7 +54,7 @@ const App: React.FC = () => {
     toasts, 
     removeToast, 
     addToast 
-  } = useGamification(userRole);
+  } = useGamification(userRole === 'visitor' ? null : userRole);
 
   // Accessibility States
   const [easyReading, setEasyReading] = useState(false);
@@ -261,18 +261,22 @@ const App: React.FC = () => {
           <Route path="/network" element={<TeacherNetworkPage />} />
           <Route path="/saved" element={<SavedPage savedArtIds={savedArtIds} onToggleSave={handleToggleSave} />} />
           
-          {/* Inject Expanded Badges Data */}
+          {/* Inject Expanded Badges Data (disabled for visitor) */}
           <Route path="/badges" element={
-             <BadgesPage 
-                badges={badges} 
-                progress={progress} 
-                leaderboard={leaderboard}
-                challenges={challenges}
-                setAvatar={setAvatar}
-                onShare={trackShare}
-             />
+             userRole === 'visitor' ? (
+                <Navigate to="/collection" replace />
+             ) : (
+                <BadgesPage 
+                   badges={badges} 
+                   progress={progress} 
+                   leaderboard={leaderboard}
+                   challenges={challenges}
+                   setAvatar={setAvatar}
+                   onShare={trackShare}
+                />
+             )
           } />
-          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/quiz" element={userRole === 'visitor' ? <Navigate to="/collection" replace /> : <QuizPage />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

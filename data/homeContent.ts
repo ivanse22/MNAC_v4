@@ -87,3 +87,46 @@ export const TEACHER_HOME_CONTENT: HomeContentConfig = {
     quoteText: "\"La educación es el arma más poderosa para cambiar el mundo.\""
   }
 };
+
+export const VISITOR_HOME_CONTENT: HomeContentConfig = {
+  hero: {
+    titleItalic: "Mil años",
+    titleNormal: "de Arte",
+    ctaPrimary: "Explorar Colección",
+    linkPrimary: "/collection",
+    ctaSecondary: "Ver Itinerarios",
+    linkSecondary: "/tours",
+    backgroundImage: IMAGES.home.heroStudent
+  },
+  romanesque: {
+    tag: "OBRA MAESTRA",
+    title: "El Pantocrátor",
+    subtitle: "de Sant Climent de Taüll",
+    description: "Descubre los frescos románicos más importantes del mundo y la fuerza expresiva de la pintura mural del siglo XII.",
+    cta: "Ver en Colección",
+    image: IMAGES.home.romanesque
+  },
+  modernism: {
+    tag: "BARCELONA 1900",
+    title: "Modernismo",
+    subtitle: "& Vanguardia",
+    description: "De Gaudí a Casas y Rusiñol. Un recorrido por la transformación artística y cultural de Barcelona.",
+    cta: "Explorar Itinerario"
+  },
+  casas: {
+    tag: "RETRATO & CRÓNICA",
+    title: "Ramon",
+    subtitle: "Casas",
+    description: "Elegancia, vida urbana y modernidad en la Barcelona de cambio de siglo.",
+    cta: "Ver Obras Clave"
+  },
+  action: {
+    tag: "TU VISITA AL MNAC",
+    titleItalic: "Prepara",
+    titleNormal: "tu Recorrido",
+    description: "Consulta horarios, mapa de salas, audioguías y rutas curadas para aprovechar al máximo tu visita.",
+    buttonText: "Planificar Visita",
+    buttonLink: "/visit",
+    quoteText: "\"El arte nos permite descubrirnos y perdernos al mismo tiempo.\""
+  }
+};

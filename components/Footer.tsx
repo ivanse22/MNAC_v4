@@ -39,7 +39,7 @@ const Footer: React.FC<FooterProps> = ({ role }) => {
           {/* COLUMNA 2: CONTENIDO ESPECÍFICO (ROL) */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-mnac-gold mb-6">
-              {role === 'teacher' ? 'Área Educativa' : 'Zona Joven'}
+              {role === 'teacher' ? 'Área Educativa' : 'Guías & Recorridos'}
             </h4>
             <ul className="space-y-3 text-sm text-gray-300 font-light">
               {role === 'teacher' ? (
@@ -52,11 +52,11 @@ const Footer: React.FC<FooterProps> = ({ role }) => {
                 </>
               ) : (
                 <>
-                  <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Quiz de Selectividad</Link></li>
-                  <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Audioguía Interactiva</Link></li>
-                  <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Top 10 Obras Clave</Link></li>
-                  <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Descarga la App</Link></li>
-                  <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Descuentos Carnet Jove</Link></li>
+                  <li><Link to="/tours" className="hover:text-white hover:pl-2 transition-all">Itinerarios & Audioguías</Link></li>
+                  <li><Link to="/collection" className="hover:text-white hover:pl-2 transition-all">Obras Imprescindibles</Link></li>
+                  <li><Link to="/visit/map" className="hover:text-white hover:pl-2 transition-all">Mapa del Museo</Link></li>
+                  <li><Link to="/collection/ai-search" className="hover:text-white hover:pl-2 transition-all">Asistente Palau IA</Link></li>
+                  <li><Link to="/visit" className="hover:text-white hover:pl-2 transition-all">Horarios y Entradas</Link></li>
                 </>
               )}
             </ul>
@@ -67,10 +67,10 @@ const Footer: React.FC<FooterProps> = ({ role }) => {
             <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">Museo</h4>
             <ul className="space-y-3 text-sm text-gray-300 font-light">
               <li><Link to="/collection" className="hover:text-white hover:pl-2 transition-all">La Colección</Link></li>
-              <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Comprar Entradas</Link></li>
-              <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Tienda Online</Link></li>
-              <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Amics del Museu</Link></li>
-              <li><Link to="#" className="hover:text-white hover:pl-2 transition-all">Accesibilidad</Link></li>
+              <li><Link to="/visit" className="hover:text-white hover:pl-2 transition-all">Planificar Visita</Link></li>
+              <li><Link to="/tours/timeline" className="hover:text-white hover:pl-2 transition-all">Línea de Tiempo</Link></li>
+              <li><Link to="/tours/authors" className="hover:text-white hover:pl-2 transition-all">Autores</Link></li>
+              <li><Link to="/visit/accessibility" className="hover:text-white hover:pl-2 transition-all">Accesibilidad</Link></li>
             </ul>
           </div>
 
