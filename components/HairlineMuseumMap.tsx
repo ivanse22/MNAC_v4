@@ -4,9 +4,10 @@ export type PointCategory = 'art' | 'service' | 'accessibility';
 
 export interface MuseumPoint {
   id: string;
-  level: 0 | 1 | 2;
+  level: 0 | 1;
   category: PointCategory;
   roomCode: string;
+  wing: 'Centro' | 'Ala Oeste' | 'Ala Este';
   title: string;
   subtitle: string;
   desc: string;
@@ -21,7 +22,7 @@ export interface MuseumPoint {
 
 interface HairlineMuseumMapProps {
   points: MuseumPoint[];
-  activeLevel: 0 | 1 | 2;
+  activeLevel: 0 | 1;
   explodedView: boolean;
   selectedId: string | null;
   onSelectPoint: (id: string) => void;
@@ -31,14 +32,13 @@ interface HairlineMuseumMapProps {
   showRoute: boolean;
 }
 
-// --- HAIRLINE ISOMETRIC PROJECTION KERNEL (Cam 45°, 0.5 elevation) ---
 type Vec2 = [number, number];
 type Sample = { u: number; v: number; nu: number; nv: number };
 
 const RAD = Math.PI / 180;
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-function createIsoProj(cx = 200, cy = 165, scale = 1.38) {
+function createIsoProj(cx = 200, cy = 166, scale = 1.44) {
   const az = 45 * RAD;
   const k = 0.5;
   const ca = Math.cos(az);
@@ -51,8 +51,7 @@ function createIsoProj(cx = 200, cy = 165, scale = 1.38) {
     return [rx * scale, (-ry * k - z * kz) * scale];
   };
 
-  // Center around world (0,0,20)
-  const [ox, oy] = raw(0, 0, 22);
+  const [ox, oy] = raw(0, 0, 14);
   const P = (x: number, y: number, z: number): Vec2 => {
     const [px, py] = raw(x, y, z);
     return [r2(px - ox + cx), r2(py - oy + cy)];
@@ -136,18 +135,15 @@ function buildPrism(
   const foot = outer.map((q) => P(q.u, q.v, z0));
   const top = outer.map((q) => P(q.u, q.v, z1));
   const sil = poly(hull(foot.concat(top)));
-  // Find front run for subtle top crease (Hairline Rule 09)
   const frontPts = inner.filter(front).map((q) => P(q.u, q.v, z1));
   const crease = openPath(frontPts);
-  const topPoly = poly(top);
-  return { sil, crease, topPoly };
+  return { sil, crease };
 }
 
-// Level stairs / origin point for "You Are Here" & wayfinding paths
-const LEVEL_ORIGIN: Record<0 | 1 | 2, [number, number]> = {
-  0: [0, 34],
-  1: [0, 12],
-  2: [0, 12],
+// Origin points per floor: North Main Entrance (P0) / Central Grand Staircase (P1)
+const LEVEL_ORIGIN: Record<0 | 1, [number, number]> = {
+  0: [0, 36],
+  1: [0, 22],
 };
 
 const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
@@ -170,33 +166,29 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
     origY: 0
   });
 
-  const { P, front } = useMemo(() => createIsoProj(200, 168, 1.42), []);
+  const { P, front } = useMemo(() => createIsoProj(200, 168, 1.44), []);
 
-  // Build Hairline isometric architectural plates for all 3 levels (Rule 06: back-to-front painter's order)
   const levelsGeometry = useMemo(() => {
-    const gap = explodedView ? 32 : 13;
-    const defs: {
-      level: 0 | 1 | 2;
-      zBase: number;
-      slab: ReturnType<typeof buildPrism>;
-      westWing: ReturnType<typeof buildPrism>;
-      eastWing: ReturnType<typeof buildPrism>;
-      ovalRotunda: ReturnType<typeof buildPrism>;
-    }[] = ([0, 1, 2] as const).map((lvl) => {
-      const lift = lvl === activeLevel ? 5 : lvl > activeLevel && !explodedView ? 42 : 0;
+    const gap = explodedView ? 38 : 16;
+    return ([0, 1] as const).map((lvl) => {
+      const lift = lvl === activeLevel ? 6 : lvl > activeLevel && !explodedView ? 44 : 0;
       const z0 = lvl * gap + lift;
-      const z1 = z0 + 5.5;
-      // Palau Nacional monumental H-shaped footprint + central Oval Rotunda
-      const slab = buildPrism(P, front, -78, -42, 78, 42, z0, z1, 8, 1.8);
-      const westWing = buildPrism(P, front, -72, -34, -26, 34, z1, z1 + 3.2, 5, 1.2);
-      const eastWing = buildPrism(P, front, 26, -34, 72, 34, z1, z1 + 3.2, 5, 1.2);
-      const ovalRotunda = buildPrism(P, front, -22, -24, 22, 24, z1, z1 + (lvl === 1 ? 6.5 : 3.5), 18, 1.5);
-      return { level: lvl, zBase: z1 + 4, slab, westWing, eastWing, ovalRotunda };
+      const z1 = z0 + 6;
+      const slab = buildPrism(P, front, -80, -44, 80, 44, z0, z1, 8, 1.8);
+      const westWing = buildPrism(P, front, -74, -34, -26, 32, z1, z1 + 3.4, 5, 1.2);
+      const eastWing = buildPrism(P, front, 26, -34, 74, 32, z1, z1 + 3.4, 5, 1.2);
+      const ovalRotunda = buildPrism(P, front, -21, -22, 21, 22, z1, z1 + (lvl === 0 ? 5.5 : 4.2), 18, 1.4);
+      // North Entrance Staircase projection (towards Plaça d'Espanya)
+      const northPortico = buildPrism(P, front, -16, 40, 16, 52, z0, z0 + 3, 4, 1);
+      return { level: lvl, zBase: z1 + 4, slab, westWing, eastWing, ovalRotunda, northPortico };
     });
-    return defs;
   }, [P, front, activeLevel, explodedView]);
 
   const selectedPoint = points.find((pt) => pt.id === selectedId) || null;
+
+  // Isometric North vector (towards +y facade facing Plaça d'Espanya)
+  const compassOrigin = P(-82, 34, 0);
+  const compassNorth = P(-82, 54, 0);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('[data-map-pin="true"]')) return;
@@ -234,8 +226,8 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
         {
           '--hl-plate': '#1F1F1F',
           '--hl-surface': '#262626',
-          '--hl-edge': 'rgba(209, 204, 191, 0.45)',
-          '--hl-mid': 'rgba(209, 204, 191, 0.18)',
+          '--hl-edge': 'rgba(209, 204, 191, 0.48)',
+          '--hl-mid': 'rgba(209, 204, 191, 0.2)',
           '--hl-lo': 'rgba(209, 204, 191, 0.08)',
           '--hl-hi': '#F14A32'
         } as React.CSSProperties
@@ -248,13 +240,13 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
         }}
       >
         <svg viewBox="0 0 400 320" className="w-full h-full overflow-visible">
-          {/* Isometric Ground Reference Grid (Rule 06: painted behind everything) */}
+          {/* Isometric Ground Reference Grid */}
           <g opacity="0.35">
             {[-90, -60, -30, 0, 30, 60, 90].map((v) => {
               const a = P(-95, v, -2);
               const b = P(95, v, -2);
-              const c = P(v, -60, -2);
-              const d = P(v, 60, -2);
+              const c = P(v, -55, -2);
+              const d = P(v, 55, -2);
               return (
                 <React.Fragment key={v}>
                   <path d={`M${a[0]},${a[1]}L${b[0]},${b[1]}`} stroke="var(--hl-lo)" strokeWidth="0.7" fill="none" />
@@ -264,13 +256,26 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
             })}
           </g>
 
-          {/* Render Floors Back-to-Front (P0 -> P1 -> P2) */}
-          {levelsGeometry.map(({ level, zBase, slab, westWing, eastWing, ovalRotunda }) => {
+          {/* Isometric North Orientation Vector (Rule 10: pure geometry) */}
+          <g opacity="0.75">
+            <path
+              d={`M${compassOrigin[0]},${compassOrigin[1]}L${compassNorth[0]},${compassNorth[1]}`}
+              stroke="#D1CCBF"
+              strokeWidth="1.2"
+              strokeDasharray="2 2"
+            />
+            <circle cx={compassNorth[0]} cy={compassNorth[1]} r="2.2" fill="#F14A32" />
+            <circle cx={compassOrigin[0]} cy={compassOrigin[1]} r="1.5" fill="#D1CCBF" />
+          </g>
+
+          {/* Render Floors Back-to-Front (P0 -> P1) */}
+          {levelsGeometry.map(({ level, zBase, slab, westWing, eastWing, ovalRotunda, northPortico }) => {
             const isActiveFloor = level === activeLevel;
             const isUpperGhost = !explodedView && level > activeLevel;
             const floorPoints = points.filter((pt) => pt.level === level);
             const origin = LEVEL_ORIGIN[level];
             const originScreen = P(origin[0], origin[1], zBase + 1);
+            const exitScreen = P(0, 49, level === 0 ? 9 : zBase);
 
             const selectedInFloor =
               selectedPoint && selectedPoint.level === level ? selectedPoint : null;
@@ -279,17 +284,29 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
               <g
                 key={level}
                 style={{
-                  opacity: isUpperGhost ? 0.12 : isActiveFloor ? 1 : 0.42,
+                  opacity: isUpperGhost ? 0.14 : isActiveFloor ? 1 : 0.42,
                   pointerEvents: isUpperGhost ? 'none' : 'auto',
                   transition: 'opacity 500ms cubic-bezier(0.32, 0.72, 0, 1)'
                 }}
               >
+                {/* North Entrance Portico (P0) */}
+                {level === 0 && (
+                  <path
+                    d={northPortico.sil}
+                    fill="var(--hl-plate)"
+                    stroke={isActiveFloor ? 'var(--hl-edge)' : 'var(--hl-mid)'}
+                    strokeWidth="0.9"
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinejoin="round"
+                  />
+                )}
+
                 {/* Main Floor Plate */}
                 <path
                   d={slab.sil}
                   fill="var(--hl-plate)"
                   stroke={isActiveFloor ? 'var(--hl-edge)' : 'var(--hl-mid)'}
-                  strokeWidth="1"
+                  strokeWidth="1.05"
                   vectorEffect="non-scaling-stroke"
                   strokeLinejoin="round"
                 />
@@ -308,7 +325,7 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                       d={wing.sil}
                       fill={isActiveFloor ? 'var(--hl-surface)' : 'var(--hl-plate)'}
                       stroke={isActiveFloor ? 'var(--hl-edge)' : 'var(--hl-mid)'}
-                      strokeWidth="0.85"
+                      strokeWidth="0.9"
                       vectorEffect="non-scaling-stroke"
                       strokeLinejoin="round"
                     />
@@ -322,10 +339,15 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                   </g>
                 ))}
 
-                {/* Active Floor Wayfinding & Interactive Dots (Rule 04 & Rule 10: geometry + dots, zero words inside SVG) */}
+                {/* Active Floor Wayfinding & Interactive Dots */}
                 {isActiveFloor && (
                   <>
-                    {/* "You Are Here" Entrance/Stair Origin Marker */}
+                    {/* Main Entrance / Exit Portico Marker */}
+                    {level === 0 && (
+                      <circle cx={exitScreen[0]} cy={exitScreen[1]} r="2.2" fill="#34D399" stroke="#1F1F1F" strokeWidth="0.8" />
+                    )}
+
+                    {/* "You Are Here" Origin Marker */}
                     <g>
                       <circle
                         cx={originScreen[0]}
@@ -334,28 +356,26 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                         fill="none"
                         stroke="#D1CCBF"
                         strokeWidth="0.8"
-                        opacity="0.6"
+                        opacity="0.65"
                       >
                         <animate attributeName="r" from="3" to="9" dur="2s" repeatCount="indefinite" />
                         <animate attributeName="opacity" from="0.7" to="0" dur="2s" repeatCount="indefinite" />
                       </circle>
-                      <circle cx={originScreen[0]} cy={originScreen[1]} r="2.6" fill="#D1CCBF" />
+                      <circle cx={originScreen[0]} cy={originScreen[1]} r="2.8" fill="#D1CCBF" />
                     </g>
 
                     {/* Animated Dashed Hairline Route to Selected Room */}
                     {showRoute && selectedInFloor && (
                       (() => {
                         const targetScreen = P(selectedInFloor.x, selectedInFloor.y, zBase + 2);
-                        const midWorldX = selectedInFloor.x;
-                        const midWorldY = origin[1];
-                        const elbowScreen = P(midWorldX, midWorldY, zBase + 1.5);
+                        const elbowScreen = P(selectedInFloor.x, origin[1], zBase + 1.5);
                         const routePath = `M${originScreen[0]},${originScreen[1]} L${elbowScreen[0]},${elbowScreen[1]} L${targetScreen[0]},${targetScreen[1]}`;
                         return (
                           <path
                             d={routePath}
                             fill="none"
                             stroke="#F14A32"
-                            strokeWidth="1.8"
+                            strokeWidth="2"
                             strokeDasharray="3 3"
                             vectorEffect="non-scaling-stroke"
                             strokeLinecap="round"
@@ -399,8 +419,7 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                             onSelectPoint(pt.id);
                           }}
                         >
-                          {/* Static invisible hit area so targets never jitter (Hairline Rule 01) */}
-                          <circle cx={sx} cy={sy} r="10" fill="transparent" />
+                          <circle cx={sx} cy={sy} r="11" fill="transparent" />
 
                           {isSelected && (
                             <circle
@@ -419,7 +438,7 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
                           <circle
                             cx={sx}
                             cy={sy}
-                            r={isSelected ? 4.2 : isHovered ? 3.6 : 2.8}
+                            r={isSelected ? 4.4 : isHovered ? 3.8 : 3}
                             fill={dotColor}
                             stroke="#1F1F1F"
                             strokeWidth="1"
