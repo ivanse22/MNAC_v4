@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Ticket,
   QrCode,
-  Calendar,
   Clock,
   MapPin,
   CheckCircle2,
   Plus,
   Trash2,
-  Sparkles,
   Building2,
   CreditCard,
-  ArrowRight,
-  Info
+  X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { UserRole } from '../types';
 import Footer from '../components/Footer';
+import OptimizedImage from '../components/OptimizedImage';
+import { IMAGES } from '../data/images';
 import { hapticService } from '../services/hapticService';
 
 interface TicketsPageProps {
@@ -35,9 +33,9 @@ interface VisitorTicket {
 }
 
 const TICKET_TIERS = [
-  { id: 'general', name: 'Entrada General', price: 12, desc: 'Colección Permanente + Exposiciones Temporales + Mirador' },
+  { id: 'general', name: 'Entrada General', price: 12, desc: 'Colección Permanente + Exposiciones + Mirador' },
   { id: 'reduced', name: 'Entrada Reducida', price: 6, desc: 'Estudiantes, Carnet Jove y grupos culturales' },
-  { id: 'free', name: 'Entrada Gratuita', price: 0, desc: 'Menores de 16 años, mayores de 65 y primer domingo de mes' },
+  { id: 'free', name: 'Entrada Gratuita', price: 0, desc: 'Menores de 16, mayores de 65 y primer domingo de mes' },
 ];
 
 const TIME_SLOTS = ['10:00h', '12:00h', '14:00h', '16:00h'];
@@ -53,6 +51,7 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
     }
   });
 
+  const [activeTab, setActiveTab] = useState<'online' | 'museum'>('online');
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const [selectedTierId, setSelectedTierId] = useState('general');
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -95,306 +94,372 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
     setTickets((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const isBuying = tickets.length === 0 || showPurchaseForm;
+  const hasTickets = tickets.length > 0;
+  const showAcquisitionMode = !hasTickets || showPurchaseForm;
 
   return (
-    <div className="min-h-screen bg-mnac-bg text-mnac-textPrimary flex flex-col pt-20 pb-24 md:pb-0">
-      {/* EDITORIAL HEADER */}
-      <section className="px-5 sm:px-6 md:px-12 pt-8 pb-8 border-b border-white/10 max-w-[1920px] mx-auto w-full">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-mnac-surface border border-white/10 mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-mnac-accent" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-textPrimary">
-                Acceso al Palau Nacional
-              </span>
-            </div>
-            <h1 className="font-serif italic text-4xl sm:text-6xl md:text-7xl text-white leading-none tracking-tight">
-              Mis Tickets
-            </h1>
-            <p className="text-xs sm:text-sm text-mnac-textSecondary mt-2 max-w-xl font-light">
-              Gestiona tus entradas digitales para acceder sin colas o consulta cómo adquirirlas en las taquillas del museo.
-            </p>
+    <div className="min-h-screen bg-mnac-bg text-mnac-textPrimary flex flex-col pb-24 md:pb-0">
+      {/* MODE A: EDITORIAL HERO WITH IMAGERY (WHEN NO TICKETS YET) */}
+      {!hasTickets && (
+        <section className="relative w-full h-[42vh] md:h-[50vh] flex flex-col justify-end p-5 sm:p-6 md:p-12 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <OptimizedImage
+              src={IMAGES.visit.hero}
+              alt="Palau Nacional MNAC"
+              priority={true}
+              aspectRatio="h-full w-full"
+              className="opacity-65 scale-105 animate-scale-slow"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-mnac-bg via-mnac-bg/50 to-transparent" />
           </div>
 
-          {tickets.length > 0 && !showPurchaseForm && (
+          <div className="relative z-10 max-w-[1920px] w-full mx-auto animate-slide-up">
+            <div className="border-b border-mnac-divider pb-5 md:pb-6">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-mnac-accent" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-textPrimary">
+                  Acceso al Palau Nacional
+                </span>
+              </div>
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif italic leading-none text-white tracking-tight">
+                Mis Tickets
+              </h1>
+            </div>
+            <p className="pt-3.5 text-[11px] sm:text-xs font-medium text-mnac-textSecondary tracking-wide">
+              Incluye Colección Permanente · Exposiciones Temporales · Mirador 360°
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* MODE B: COMPACT TYPOGRAPHIC HEADER (WHEN ACTIVE TICKETS EXIST SO WALLET PASS SHINES) */}
+      {hasTickets && (
+        <section className="pt-24 md:pt-28 px-5 sm:px-6 md:px-12 pb-6 border-b border-white/10 max-w-[1920px] mx-auto w-full">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1.5">
+                Wallet Digital · {tickets.length} {tickets.length === 1 ? 'entrada' : 'entradas'}
+              </span>
+              <h1 className="font-serif italic text-4xl sm:text-5xl md:text-6xl text-white leading-none tracking-tight">
+                Mis Tickets
+              </h1>
+            </div>
+
             <button
               onClick={() => {
                 hapticService.light();
-                setShowPurchaseForm(true);
+                setShowPurchaseForm(!showPurchaseForm);
               }}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-mnac-accent text-white text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform self-start md:self-auto"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-mnac-accent text-white text-[10px] font-bold uppercase tracking-widest active:scale-95 transition-transform shrink-0"
             >
-              <Plus size={16} /> Comprar otro ticket
+              {showPurchaseForm ? (
+                <>
+                  <X size={14} /> Cerrar
+                </>
+              ) : (
+                <>
+                  <Plus size={14} /> Añadir
+                </>
+              )}
             </button>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
-      <main className="flex-grow max-w-[1920px] mx-auto w-full px-5 sm:px-6 md:px-12 py-8 space-y-8">
-        {/* ACTIVE TICKETS WALLET */}
-        {tickets.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent">
-                Entradas Activas ({tickets.length})
-              </span>
-            </div>
+      <main className="flex-grow max-w-[1920px] mx-auto w-full px-5 sm:px-6 md:px-12 py-6 md:py-10 space-y-8">
+        {/* WALLET DIGITAL PASSES (ONLY WHEN USER HAS TICKETS AND NOT ADDING MORE) */}
+        {hasTickets && !showPurchaseForm && (
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+            {tickets.map((t) => (
+              <div
+                key={t.id}
+                className="bg-mnac-surface border border-white/15 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+              >
+                {/* Top Artwork Watermark Header */}
+                <div className="relative h-36 overflow-hidden">
+                  <OptimizedImage
+                    src="/artworks/art-0.jpg"
+                    alt="Pase MNAC"
+                    aspectRatio="h-full w-full"
+                    className="opacity-55 scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-mnac-surface via-mnac-surface/50 to-black/40" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {tickets.map((t) => (
-                <div
-                  key={t.id}
-                  className="bg-mnac-surface border border-white/15 rounded-2xl overflow-hidden shadow-xl flex flex-col sm:flex-row"
-                >
-                  {/* QR Pass Stub */}
-                  <div className="sm:w-44 bg-white text-black p-5 flex flex-col items-center justify-center gap-2 shrink-0 border-b sm:border-b-0 sm:border-r border-dashed border-black/20">
-                    <QrCode size={92} strokeWidth={1.5} />
-                    <span className="font-mono text-[11px] font-bold tracking-wider">{t.id}</span>
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-emerald-400/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                      <CheckCircle2 size={12} /> Válida
+                    </span>
+                    <button
+                      onClick={() => handleRemoveTicket(t.id)}
+                      aria-label="Eliminar ticket"
+                      className="p-2 rounded-full bg-black/50 backdrop-blur-md text-white/70 hover:text-mnac-accent active:scale-95 transition-all"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
 
-                  {/* Ticket Details */}
-                  <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-                          <CheckCircle2 size={12} /> Válida
-                        </span>
-                        <button
-                          onClick={() => handleRemoveTicket(t.id)}
-                          aria-label="Eliminar ticket"
-                          className="p-1.5 text-mnac-textSecondary hover:text-mnac-accent transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-
-                      <h3 className="font-serif italic text-2xl text-white">{t.type}</h3>
-                      <p className="text-xs text-mnac-textSecondary mt-1">
-                        {t.quantity} {t.quantity === 1 ? 'persona' : 'personas'} · {t.price === 0 ? 'Gratuita' : `${t.price}€`}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/10 text-xs">
-                      <div className="flex items-center gap-2 text-mnac-textPrimary">
-                        <Calendar size={14} className="text-mnac-accent shrink-0" />
-                        <span>{t.date}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-mnac-textPrimary">
-                        <Clock size={14} className="text-mnac-accent shrink-0" />
-                        <span>{t.timeSlot}</span>
-                      </div>
-                    </div>
+                  <div className="absolute bottom-3 left-5 right-5">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-mnac-accent block">
+                      Museu Nacional d'Art de Catalunya
+                    </span>
+                    <h2 className="font-serif italic text-2xl text-white leading-tight">
+                      {t.type}
+                    </h2>
                   </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Middle Ticket Info */}
+                <div className="px-5 py-4 grid grid-cols-3 gap-2 border-b border-dashed border-white/15 text-xs">
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-mnac-textSecondary block mb-0.5">
+                      Fecha
+                    </span>
+                    <span className="font-semibold text-white">{t.date}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-mnac-textSecondary block mb-0.5">
+                      Acceso
+                    </span>
+                    <span className="font-semibold text-white">{t.timeSlot}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-mnac-textSecondary block mb-0.5">
+                      Visitantes
+                    </span>
+                    <span className="font-semibold text-white">
+                      {t.quantity} · {t.price === 0 ? 'Gratis' : `${t.price}€`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Perforated QR Footer */}
+                <div className="p-5 bg-white text-black flex items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-black/50 block mb-1">
+                      Código de Acceso
+                    </span>
+                    <span className="font-mono text-sm font-bold tracking-wider block">
+                      {t.id}
+                    </span>
+                    <span className="text-[11px] text-black/60 block mt-1">
+                      Muestra este QR en el torno
+                    </span>
+                  </div>
+                  <div className="p-1.5 rounded-xl bg-white border border-black/10 shrink-0">
+                    <QrCode size={76} strokeWidth={1.5} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </section>
         )}
 
-        {/* EMPTY STATE NOTICE WHEN NO TICKETS */}
-        {tickets.length === 0 && (
-          <div className="p-5 sm:p-6 rounded-2xl bg-mnac-surface border border-white/10 flex items-start gap-4">
-            <div className="w-11 h-11 rounded-xl bg-mnac-accent/15 border border-mnac-accent/30 flex items-center justify-center text-mnac-accent shrink-0">
-              <Ticket size={20} />
+        {/* ACQUISITION FLOW WITH CLEAN SEGMENTED TABS */}
+        {showAcquisitionMode && (
+          <section className="max-w-2xl mx-auto w-full space-y-6 animate-fade-in">
+            {/* Segmented Pill Tabs */}
+            <div className="grid grid-cols-2 p-1.5 rounded-full bg-mnac-surface border border-white/10">
+              <button
+                type="button"
+                onClick={() => {
+                  hapticService.light();
+                  setActiveTab('online');
+                }}
+                className={`py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                  activeTab === 'online'
+                    ? 'bg-mnac-accent text-white shadow-lg'
+                    : 'text-mnac-textSecondary hover:text-white'
+                }`}
+              >
+                Comprar Online
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  hapticService.light();
+                  setActiveTab('museum');
+                }}
+                className={`py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                  activeTab === 'museum'
+                    ? 'bg-mnac-accent text-white shadow-lg'
+                    : 'text-mnac-textSecondary hover:text-white'
+                }`}
+              >
+                En Taquilla
+              </button>
             </div>
-            <div>
-              <h2 className="font-serif italic text-xl sm:text-2xl text-white">
-                Aún no tienes tickets guardados
-              </h2>
-              <p className="text-xs sm:text-sm text-mnac-textSecondary mt-1 leading-relaxed">
-                Puedes comprar tu entrada digital ahora mismo para llevar el código QR en tu móvil, o adquirirla directamente en las taquillas al llegar al museo.
-              </p>
-            </div>
-          </div>
-        )}
 
-        {/* TWO CLEAR OPTIONS: ONLINE PURCHASE vs. AT THE MUSEUM */}
-        {isBuying && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* OPTION 1: BUY ONLINE */}
-            <form
-              onSubmit={handleConfirmPurchase}
-              className="lg:col-span-7 bg-mnac-surface border border-white/10 rounded-2xl p-5 sm:p-7 space-y-6"
-            >
-              <div className="flex items-center justify-between">
+            {/* TAB 1: BUY ONLINE */}
+            {activeTab === 'online' && (
+              <form
+                onSubmit={handleConfirmPurchase}
+                className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6"
+              >
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-                    Opción 1 · Digital
-                  </span>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
-                    Comprar Entrada Online
+                    Entrada Digital Inmediata
                   </h2>
-                </div>
-                {tickets.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowPurchaseForm(false)}
-                    className="text-xs text-mnac-textSecondary hover:text-white"
-                  >
-                    Cancelar
-                  </button>
-                )}
-              </div>
-
-              {/* Tier Selection */}
-              <div className="space-y-2.5">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary">
-                  Tipo de Entrada
-                </label>
-                {TICKET_TIERS.map((tier) => {
-                  const active = selectedTierId === tier.id;
-                  return (
-                    <button
-                      type="button"
-                      key={tier.id}
-                      onClick={() => {
-                        hapticService.light();
-                        setSelectedTierId(tier.id);
-                      }}
-                      className={`w-full text-left p-4 rounded-xl border transition-all active:scale-[0.99] flex items-center justify-between gap-4 ${
-                        active
-                          ? 'bg-mnac-accent/15 border-mnac-accent text-white'
-                          : 'bg-mnac-bg/60 border-white/10 text-mnac-textPrimary hover:border-white/25'
-                      }`}
-                    >
-                      <div>
-                        <p className="font-semibold text-sm text-white">{tier.name}</p>
-                        <p className="text-[11px] text-mnac-textSecondary mt-0.5">{tier.desc}</p>
-                      </div>
-                      <span className="font-serif italic text-xl text-white shrink-0">
-                        {tier.price === 0 ? 'Gratis' : `${tier.price}€`}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Date, Time & Quantity */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
-                    Fecha de Visita
-                  </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full bg-mnac-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mnac-accent"
-                    required
-                  />
+                  <p className="text-xs text-mnac-textSecondary mt-1">
+                    Recibe tu código QR al instante para acceder directamente a las salas.
+                  </p>
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
-                    Personas
+                {/* Tier Selection */}
+                <div className="space-y-2.5">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary">
+                    Tarifa
                   </label>
-                  <div className="flex items-center gap-2">
-                    {[1, 2, 3, 4].map((num) => (
+                  {TICKET_TIERS.map((tier) => {
+                    const active = selectedTierId === tier.id;
+                    return (
                       <button
                         type="button"
-                        key={num}
+                        key={tier.id}
                         onClick={() => {
                           hapticService.light();
-                          setQuantity(num);
+                          setSelectedTierId(tier.id);
                         }}
-                        className={`flex-1 py-3 rounded-xl text-xs font-bold border active:scale-95 transition-all ${
-                          quantity === num
-                            ? 'bg-mnac-accent border-mnac-accent text-white'
+                        className={`w-full text-left p-4 rounded-2xl border transition-all active:scale-[0.99] flex items-center justify-between gap-4 ${
+                          active
+                            ? 'bg-mnac-accent/15 border-mnac-accent text-white'
+                            : 'bg-mnac-bg/60 border-white/10 text-mnac-textPrimary hover:border-white/25'
+                        }`}
+                      >
+                        <div>
+                          <p className="font-semibold text-sm text-white">{tier.name}</p>
+                          <p className="text-[11px] text-mnac-textSecondary mt-0.5">{tier.desc}</p>
+                        </div>
+                        <span className="font-serif italic text-xl text-white shrink-0">
+                          {tier.price === 0 ? 'Gratis' : `${tier.price}€`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Date & Persons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
+                      Fecha
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="w-full bg-mnac-bg border border-white/10 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mnac-accent"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
+                      Personas
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {[1, 2, 3, 4].map((num) => (
+                        <button
+                          type="button"
+                          key={num}
+                          onClick={() => {
+                            hapticService.light();
+                            setQuantity(num);
+                          }}
+                          className={`flex-1 py-3 rounded-2xl text-xs font-bold border active:scale-95 transition-all ${
+                            quantity === num
+                              ? 'bg-mnac-accent border-mnac-accent text-white'
+                              : 'bg-mnac-bg border-white/10 text-mnac-textSecondary hover:text-white'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time Slot */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
+                    Franja Horaria
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {TIME_SLOTS.map((slot) => (
+                      <button
+                        type="button"
+                        key={slot}
+                        onClick={() => {
+                          hapticService.light();
+                          setSelectedTime(slot);
+                        }}
+                        className={`py-2.5 rounded-full text-xs font-bold border active:scale-95 transition-all ${
+                          selectedTime === slot
+                            ? 'bg-white text-black border-white'
                             : 'bg-mnac-bg border-white/10 text-mnac-textSecondary hover:text-white'
                         }`}
                       >
-                        {num}
+                        {slot}
                       </button>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Time Slot */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary mb-2">
-                  Franja Horaria
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {TIME_SLOTS.map((slot) => (
-                    <button
-                      type="button"
-                      key={slot}
-                      onClick={() => {
-                        hapticService.light();
-                        setSelectedTime(slot);
-                      }}
-                      className={`py-2.5 rounded-full text-xs font-bold border active:scale-95 transition-all ${
-                        selectedTime === slot
-                          ? 'bg-white text-black border-white'
-                          : 'bg-mnac-bg border-white/10 text-mnac-textSecondary hover:text-white'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                {/* Submit */}
+                <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary block">
+                      Total
+                    </span>
+                    <span className="font-serif italic text-3xl text-white">
+                      {selectedTier.price * quantity === 0 ? 'Gratis' : `${selectedTier.price * quantity}€`}
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="px-7 py-4 rounded-full bg-mnac-accent text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 active:scale-95 transition-transform shadow-lg"
+                  >
+                    <CreditCard size={16} /> Obtener Ticket Digital
+                  </button>
                 </div>
-              </div>
+              </form>
+            )}
 
-              {/* Checkout CTA */}
-              <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* TAB 2: BUY AT THE MUSEUM */}
+            {activeTab === 'museum' && (
+              <div className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-fade-in">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-mnac-textSecondary block">
-                    Total a pagar
-                  </span>
-                  <span className="font-serif italic text-3xl text-white">
-                    {selectedTier.price * quantity === 0 ? 'Gratis' : `${selectedTier.price * quantity}€`}
-                  </span>
-                </div>
-
-                <button
-                  type="submit"
-                  className="px-7 py-4 rounded-full bg-mnac-accent text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 active:scale-95 transition-transform shadow-lg"
-                >
-                  <CreditCard size={16} /> Obtener Ticket Digital
-                </button>
-              </div>
-            </form>
-
-            {/* OPTION 2: BUY AT THE MUSEUM */}
-            <div className="lg:col-span-5 space-y-5">
-              <div className="bg-mnac-surface border border-white/10 rounded-2xl p-5 sm:p-7 space-y-5">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-                    Opción 2 · Presencial
-                  </span>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
-                    Comprar en el Museo
+                    Taquillas del Museo
                   </h2>
-                  <p className="text-xs sm:text-sm text-mnac-textSecondary mt-2 leading-relaxed">
-                    Si prefieres adquirir tu entrada al llegar, puedes comprarla directamente en las taquillas del edificio sin reserva previa (sujeto a aforo).
+                  <p className="text-xs sm:text-sm text-mnac-textSecondary mt-1.5 leading-relaxed">
+                    También puedes adquirir tus entradas presencialmente al llegar al Palau Nacional (sujeto a disponibilidad de aforo).
                   </p>
                 </div>
 
-                <div className="space-y-3.5 pt-2 border-t border-white/10 text-xs">
-                  <div className="flex items-start gap-3">
-                    <Building2 size={16} className="text-mnac-accent shrink-0 mt-0.5" />
+                <div className="space-y-4 pt-2 border-t border-white/10 text-xs sm:text-sm">
+                  <div className="flex items-start gap-3.5">
+                    <Building2 size={18} className="text-mnac-accent shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-white">Taquillas del Vestíbulo Principal</p>
-                      <p className="text-mnac-textSecondary">Planta 0 · Palau Nacional, Parc de Montjuïc</p>
+                      <p className="font-semibold text-white">Vestíbulo Principal · Planta 0</p>
+                      <p className="text-mnac-textSecondary text-xs mt-0.5">Palau Nacional, Parc de Montjuïc, Barcelona</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <Clock size={16} className="text-mnac-accent shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3.5">
+                    <Clock size={18} className="text-mnac-accent shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-white">Horario de Taquilla</p>
-                      <p className="text-mnac-textSecondary">Martes a sábado: 10:00 – 17:30h · Domingos: 10:00 – 14:30h</p>
+                      <p className="text-mnac-textSecondary text-xs mt-0.5">Martes a sábado: 10:00 – 17:30h · Domingos: 10:00 – 14:30h</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <CreditCard size={16} className="text-mnac-accent shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3.5">
+                    <CreditCard size={18} className="text-mnac-accent shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-white">Métodos de Pago</p>
-                      <p className="text-mnac-textSecondary">Tarjeta, Apple Pay / Google Pay y efectivo</p>
+                      <p className="text-mnac-textSecondary text-xs mt-0.5">Tarjeta, Apple Pay / Google Pay y efectivo</p>
                     </div>
                   </div>
                 </div>
@@ -402,38 +467,13 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
                 <Link
                   to="/visit/map"
                   onClick={() => hapticService.light()}
-                  className="w-full py-3.5 px-5 rounded-full bg-mnac-bg border border-white/15 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:border-white/30 active:scale-95 transition-all"
+                  className="w-full py-4 px-5 rounded-full bg-mnac-bg border border-white/15 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:border-white/30 active:scale-95 transition-all"
                 >
-                  <MapPin size={15} className="text-mnac-accent" /> Ver Ubicación en Mapa
+                  <MapPin size={16} className="text-mnac-accent" /> Ver Ubicación en Mapa
                 </Link>
               </div>
-
-              {/* WHAT IS INCLUDED */}
-              <div className="bg-mnac-surface border border-white/10 rounded-2xl p-5 space-y-3">
-                <div className="flex items-center gap-2 text-white font-semibold text-xs uppercase tracking-wider">
-                  <Info size={14} className="text-mnac-accent" /> ¿Qué incluye tu entrada?
-                </div>
-                <ul className="space-y-2 text-xs text-mnac-textSecondary">
-                  <li className="flex items-center gap-2">
-                    <Sparkles size={12} className="text-mnac-accent shrink-0" /> Acceso a toda la Colección Permanente
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Sparkles size={12} className="text-mnac-accent shrink-0" /> Exposiciones temporales del día
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Sparkles size={12} className="text-mnac-accent shrink-0" /> Acceso a las terrazas del Mirador
-                  </li>
-                </ul>
-                <Link
-                  to="/visit"
-                  onClick={() => hapticService.light()}
-                  className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-mnac-accent pt-1"
-                >
-                  Más información de la visita <ArrowRight size={12} />
-                </Link>
-              </div>
-            </div>
-          </div>
+            )}
+          </section>
         )}
       </main>
 
