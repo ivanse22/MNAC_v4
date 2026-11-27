@@ -9,8 +9,7 @@ import {
   Headphones,
   Sparkles,
   Search,
-  Trophy,
-  Flame,
+  Compass,
   Download,
   X
 } from 'lucide-react';
@@ -21,7 +20,6 @@ import { useHomeContent } from '../hooks/useHomeContent';
 import OptimizedImage from '../components/OptimizedImage';
 import { IMAGES } from '../data/images';
 import { ARTWORKS_DATA } from '../data/artworks';
-import { useGamification } from '../hooks/useGamification';
 import { hapticService } from '../services/hapticService';
 import QRScannerModal from '../components/QRScannerModal';
 
@@ -81,7 +79,6 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
   if (!role) return <Navigate to="/" replace />;
 
   const { content } = useHomeContent(role);
-  const { progress } = useGamification(role);
   const { hash } = useLocation();
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showPwaBanner, setShowPwaBanner] = useState(false);
@@ -232,35 +229,30 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
         </div>
       </section>
 
-      {/* GAMIFICATION PROGRESS WIDGET */}
+      {/* VISITOR INFO CARD - WHAT TO EXPECT */}
       <section className="px-5 sm:px-6 md:px-12 py-3 max-w-[1920px] mx-auto w-full">
         <Link
-          to="/badges"
+          to="/visit"
           onClick={() => hapticService.light()}
-          className="flex items-center justify-between p-4 rounded-2xl bg-mnac-surface border border-white/10 active:scale-[0.98] transition-transform"
+          className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-mnac-surface border border-white/10 hover:border-white/25 active:scale-[0.98] transition-all"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-xl bg-mnac-accent/15 border border-mnac-accent/30 flex items-center justify-center text-mnac-accent shrink-0">
-              <Trophy size={20} />
+              <Compass size={20} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-white">Nivel {progress.level}</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-white">Prepara tu Visita</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-mnac-secondary font-semibold">
-                  {progress.xp} XP
+                  Palau Nacional
                 </span>
               </div>
               <p className="text-[11px] text-mnac-textSecondary mt-0.5">
-                {progress.unlockedBadges.length} insignias · {progress.readArtworks.length} obras exploradas
+                Horarios, accesos, mirador, taquillas y servicios del museo
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-mnac-accent shrink-0">
-            <span className="inline-flex items-center gap-1 text-xs font-bold">
-              <Flame size={14} /> {progress.streak}d
-            </span>
-            <ArrowRight size={16} className="text-mnac-textSecondary" />
-          </div>
+          <ArrowRight size={16} className="text-mnac-textSecondary shrink-0" />
         </Link>
       </section>
 
