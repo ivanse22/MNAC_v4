@@ -49,7 +49,7 @@ const MENU_ITEMS = [
     id: '04',
     label: 'Exposiciones',
     sub: 'Agenda 2024',
-    image: IMAGES.artworks.suenoSurrealista,
+    image: IMAGES.artworks.desconsol,
     path: '/#exhibitions',
     subItems: [] 
   }

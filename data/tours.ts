@@ -60,12 +60,12 @@ export const TOURS_DATA: Itinerary[] = [
   },
   {
     id: 'tour-vanguardia',
-    title: 'Sueños de Vanguardia Exprés',
-    description: 'Recorrido breve de 20 minutos por la ruptura con la realidad: abstracción, surrealismo y formas oníricas.',
+    title: 'Crónica Social y Emoción Moderna',
+    description: 'Recorrido breve de 20 minutos por el cambio de siglo en Barcelona: realismo social, escultura simbolista y modernidad.',
     duration: 20,
     difficulty: 'Baja',
-    tags: ['Vanguardia', 'Surrealismo', 'Cortos'],
-    stops: ['art-6', 'art-11', 'art-4'],
+    tags: ['Realismo', 'Modernismo', 'Cortos'],
+    stops: ['art-6', 'art-11', 'art-10'],
     coverImage: IMAGES.tourCovers.vanguardia,
     type: 'Curated'
   }
