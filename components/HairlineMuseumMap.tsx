@@ -27,6 +27,7 @@ interface HairlineMuseumMapProps {
   selectedId: string | null;
   onSelectPoint: (id: string) => void;
   scale: number;
+  onScaleChange: (next: number) => void;
   pan: { x: number; y: number };
   onPanChange: (next: { x: number; y: number }) => void;
   showRoute: boolean;
@@ -153,18 +154,47 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
   selectedId,
   onSelectPoint,
   scale,
+  onScaleChange,
   pan,
   onPanChange,
   showRoute
 }) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const dragRef = useRef<{ active: boolean; startX: number; startY: number; origX: number; origY: number }>({
-    active: false,
+  const [isInteracting, setIsInteracting] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const gestureRef = useRef<{
+    mode: 'none' | 'pan' | 'pinch';
+    startX: number;
+    startY: number;
+    origPanX: number;
+    origPanY: number;
+    startDist: number;
+    origScale: number;
+  }>({
+    mode: 'none',
     startX: 0,
     startY: 0,
-    origX: 0,
-    origY: 0
+    origPanX: 0,
+    origPanY: 0,
+    startDist: 0,
+    origScale: 1
   });
+
+  // Non-passive wheel zoom for trackpad/desktop
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = -e.deltaY * 0.002;
+      const next = Math.max(0.75, Math.min(3, Number((scale + delta).toFixed(2))));
+      onScaleChange(next);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [scale, onScaleChange]);
 
   const { P, front } = useMemo(() => createIsoProj(200, 168, 1.44), []);
 
@@ -190,40 +220,157 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
   const compassOrigin = P(-82, 34, 0);
   const compassNorth = P(-82, 54, 0);
 
+  const clampPan = (x: number, y: number) => ({
+    x: Math.max(-260, Math.min(260, x)),
+    y: Math.max(-200, Math.min(200, y))
+  });
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('[data-map-pin="true"]')) return;
-    dragRef.current = {
-      active: true,
-      startX: e.clientX,
-      startY: e.clientY,
-      origX: pan.x,
-      origY: pan.y
-    };
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore synthetic pointer capture errors
+    }
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    setIsInteracting(true);
+
+    if (pointersRef.current.size === 1) {
+      gestureRef.current = {
+        mode: 'pan',
+        startX: e.clientX,
+        startY: e.clientY,
+        origPanX: pan.x,
+        origPanY: pan.y,
+        startDist: 0,
+        origScale: scale
+      };
+    } else if (pointersRef.current.size === 2) {
+      const pts = Array.from(pointersRef.current.values());
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const midX = (pts[0].x + pts[1].x) / 2;
+      const midY = (pts[0].y + pts[1].y) / 2;
+      gestureRef.current = {
+        mode: 'pinch',
+        startX: midX,
+        startY: midY,
+        origPanX: pan.x,
+        origPanY: pan.y,
+        startDist: Math.max(dist, 10),
+        origScale: scale
+      };
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current.active) return;
-    const dx = e.clientX - dragRef.current.startX;
-    const dy = e.clientY - dragRef.current.startY;
-    onPanChange({
-      x: Math.max(-180, Math.min(180, dragRef.current.origX + dx)),
-      y: Math.max(-140, Math.min(140, dragRef.current.origY + dy))
-    });
+    if (!pointersRef.current.has(e.pointerId)) return;
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size === 1 && gestureRef.current.mode === 'pan') {
+      const dx = e.clientX - gestureRef.current.startX;
+      const dy = e.clientY - gestureRef.current.startY;
+      onPanChange(clampPan(gestureRef.current.origPanX + dx, gestureRef.current.origPanY + dy));
+    } else if (pointersRef.current.size >= 2 && gestureRef.current.mode === 'pinch') {
+      const pts = Array.from(pointersRef.current.values());
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const midX = (pts[0].x + pts[1].x) / 2;
+      const midY = (pts[0].y + pts[1].y) / 2;
+      const ratio = dist / gestureRef.current.startDist;
+      const nextScale = Math.max(0.75, Math.min(3, Number((gestureRef.current.origScale * ratio).toFixed(2))));
+      onScaleChange(nextScale);
+      const dx = midX - gestureRef.current.startX;
+      const dy = midY - gestureRef.current.startY;
+      onPanChange(clampPan(gestureRef.current.origPanX + dx, gestureRef.current.origPanY + dy));
+    }
   };
 
-  const handlePointerUp = () => {
-    dragRef.current.active = false;
+  const handlePointerUp = (e: React.PointerEvent) => {
+    pointersRef.current.delete(e.pointerId);
+    if (pointersRef.current.size === 1) {
+      const remaining = Array.from(pointersRef.current.values())[0];
+      gestureRef.current = {
+        mode: 'pan',
+        startX: remaining.x,
+        startY: remaining.y,
+        origPanX: pan.x,
+        origPanY: pan.y,
+        startDist: 0,
+        origScale: scale
+      };
+    } else if (pointersRef.current.size === 0) {
+      gestureRef.current.mode = 'none';
+      setIsInteracting(false);
+    }
+  };
+
+  // Native Touch fallback for iOS Safari 2-finger pinch-to-zoom
+  const touchPinchRef = useRef<{ active: boolean; startDist: number; origScale: number; midX: number; midY: number; origPanX: number; origPanY: number }>({
+    active: false,
+    startDist: 0,
+    origScale: 1,
+    midX: 0,
+    midY: 0,
+    origPanX: 0,
+    origPanY: 0
+  });
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      setIsInteracting(true);
+      const t0 = e.touches[0];
+      const t1 = e.touches[1];
+      touchPinchRef.current = {
+        active: true,
+        startDist: Math.max(Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY), 10),
+        origScale: scale,
+        midX: (t0.clientX + t1.clientX) / 2,
+        midY: (t0.clientY + t1.clientY) / 2,
+        origPanX: pan.x,
+        origPanY: pan.y
+      };
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && touchPinchRef.current.active) {
+      const t0 = e.touches[0];
+      const t1 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+      const midX = (t0.clientX + t1.clientX) / 2;
+      const midY = (t0.clientY + t1.clientY) / 2;
+      const ratio = dist / touchPinchRef.current.startDist;
+      const nextScale = Math.max(0.75, Math.min(3, Number((touchPinchRef.current.origScale * ratio).toFixed(2))));
+      onScaleChange(nextScale);
+      onPanChange(
+        clampPan(
+          touchPinchRef.current.origPanX + (midX - touchPinchRef.current.midX),
+          touchPinchRef.current.origPanY + (midY - touchPinchRef.current.midY)
+        )
+      );
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      touchPinchRef.current.active = false;
+      if (e.touches.length === 0) setIsInteracting(false);
+    }
   };
 
   return (
     <div
+      ref={containerRef}
       className="w-full h-full flex items-center justify-center overflow-hidden touch-none select-none cursor-grab active:cursor-grabbing"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={
         {
+          touchAction: 'none',
           '--hl-plate': '#1F1F1F',
           '--hl-surface': '#262626',
           '--hl-edge': 'rgba(209, 204, 191, 0.48)',
@@ -234,7 +381,7 @@ const HairlineMuseumMap: React.FC<HairlineMuseumMapProps> = ({
       }
     >
       <div
-        className="w-full max-w-[920px] aspect-[5/4] transition-transform duration-300 ease-out"
+        className={`w-full max-w-[920px] aspect-[5/4] ${isInteracting ? '' : 'transition-transform duration-300 ease-out'}`}
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`
         }}

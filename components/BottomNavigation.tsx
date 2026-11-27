@@ -132,19 +132,19 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
           isVisible ? 'translate-y-0' : 'translate-y-[120%]'
         }`}
       >
-        <div className="relative flex justify-center items-end px-4 pb-6 w-full">
+        <div className="relative flex justify-center items-end px-4 pb-2 w-full">
           
           <nav 
-            className="relative pointer-events-auto w-full max-w-md h-20 rounded-[2.5rem] flex items-center justify-between px-1 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-2xl bg-[#121212]/85 overflow-visible"
+            className="relative pointer-events-auto w-full max-w-md h-[68px] rounded-[2.25rem] flex items-center justify-between px-2 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-2xl bg-[#121212]/90 overflow-visible"
           >
             
             {/* SVG Mask for the "Concave" Cutout effect in the center */}
             <div 
-              className="absolute inset-0 rounded-[2.5rem] pointer-events-none border border-white/5"
+              className="absolute inset-0 rounded-[2.25rem] pointer-events-none border border-white/5"
               style={{
                 // Radial gradient mask creates the "bite" for the button
-                WebkitMaskImage: 'radial-gradient(circle at 50% -10px, transparent 38px, black 39px)',
-                maskImage: 'radial-gradient(circle at 50% -10px, transparent 38px, black 39px)'
+                WebkitMaskImage: 'radial-gradient(circle at 50% -8px, transparent 34px, black 35px)',
+                maskImage: 'radial-gradient(circle at 50% -8px, transparent 34px, black 35px)'
               }}
             >
                {/* Inner Gloss */}
@@ -152,17 +152,17 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
             </div>
 
             {/* Left Group */}
-            <div className="flex-1 flex justify-evenly items-center z-10 pl-2">
+            <div className="flex-1 flex justify-evenly items-center z-10 pl-1">
               <NavItem 
                 to="/" 
-                icon={<Home size={24} />} 
+                icon={<Home size={22} />} 
                 isActive={isActive('/')} 
                 onClick={handleTabClick} 
                 label="Inicio"
               />
               <NavItem 
                 to="/visit" 
-                icon={<Map size={24} />} 
+                icon={<Map size={22} />} 
                 isActive={isActive('/visit')} 
                 onClick={handleTabClick} 
                 label="Visita"
@@ -170,21 +170,21 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ onScan, onChat, rol
             </div>
 
             {/* --- CENTRAL ORBITAL BUTTON --- */}
-            <div className="relative w-20 flex justify-center items-center z-20 -top-6">
+            <div className="relative w-16 flex justify-center items-center z-20 -top-5">
                {/* The Button */}
                <button
                   onMouseDown={handleScannerPressStart}
                   onMouseUp={handleScannerPressEnd}
                   onTouchStart={handleScannerPressStart}
                   onTouchEnd={handleScannerPressEnd}
-                  className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group relative active:scale-90"
+                  className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 group relative active:scale-90"
                   style={{
                     backgroundColor: '#F14A32', // MNAC Vermilion
                     boxShadow: '0 8px 25px rgba(241, 74, 50, 0.5), inset 0 2px 4px rgba(255,255,255,0.3)',
                   }}
                   aria-label="Escanear"
                >
-                  <ScanLine size={26} className="text-white relative z-10" strokeWidth={2.5} />
+                  <ScanLine size={23} className="text-white relative z-10" strokeWidth={2.5} />
                   
                   {/* Subtle Pulse Ring */}
                   <div className="absolute inset-0 rounded-full border border-white/40 animate-ping opacity-20 pointer-events-none"></div>

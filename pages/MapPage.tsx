@@ -276,8 +276,8 @@ const MUSEUM_POINTS: MuseumPoint[] = [
 ];
 
 const LEVEL_INFO: Record<0 | 1, { short: string; title: string }> = {
-  0: { short: 'P0 · Baja', title: 'Planta 0 · Vestíbulo, Medieval y Barroco' },
-  1: { short: 'P1 · Superior', title: 'Planta 1 · Arte Moderno, Cúpula y Mirador' }
+  0: { short: 'P0 · Baja', title: 'Planta 0 · Vestíbulo & Medieval' },
+  1: { short: 'P1 · Superior', title: 'Planta 1 · Moderno & Mirador' }
 };
 
 const CATEGORY_FILTERS: { id: 'all' | PointCategory; label: string }[] = [
@@ -368,6 +368,7 @@ const MapPage: React.FC<MapPageProps> = () => {
           selectedId={selectedRoomId}
           onSelectPoint={handleSelectPoint}
           scale={scale}
+          onScaleChange={setScale}
           pan={pan}
           onPanChange={setPan}
           showRoute={showRoute}
@@ -375,7 +376,7 @@ const MapPage: React.FC<MapPageProps> = () => {
       </div>
 
       {/* --- TOP HUD: TITLE, COMPASS/NORTH, STRUCTURE INFO, SEARCH & PILLS --- */}
-      <div className="relative z-20 pt-20 md:pt-24 px-4 sm:px-6 pointer-events-none">
+      <div className="relative z-20 pt-24 md:pt-28 px-4 sm:px-6 pointer-events-none">
         <div className="max-w-5xl mx-auto space-y-3 pointer-events-auto">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -521,9 +522,54 @@ const MapPage: React.FC<MapPageProps> = () => {
         </div>
       </div>
 
-      {/* --- FLOATING CONTROLS DOCK (HIDDEN ON MOBILE WHEN ROOM CARD IS OPEN SO IT NEVER COLLIDES) --- */}
+      {/* --- MOBILE RIGHT VERTICAL RAIL (ZOOM, 3D, RECENTER) --- */}
+      {!selectedRoom && (
+        <div className="fixed right-3 bottom-36 z-20 flex md:hidden flex-col items-center gap-1 bg-mnac-surface/95 backdrop-blur-xl shadow-2xl rounded-full p-1.5 border border-white/15">
+          <button
+            onClick={() => {
+              hapticService.light();
+              setExplodedView(!explodedView);
+            }}
+            aria-label="Vista 3D por plantas"
+            className={`w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all ${
+              explodedView ? 'bg-mnac-accent/25 text-mnac-accent' : 'text-mnac-textSecondary hover:text-white'
+            }`}
+          >
+            <Layers size={18} />
+          </button>
+          <button
+            onClick={() => {
+              hapticService.light();
+              setScale((prev) => Math.min(3, Number((prev + 0.3).toFixed(2))));
+            }}
+            aria-label="Acercar"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <ZoomIn size={18} />
+          </button>
+          <button
+            onClick={() => {
+              hapticService.light();
+              setScale((prev) => Math.max(0.75, Number((prev - 0.3).toFixed(2))));
+            }}
+            aria-label="Alejar"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <ZoomOut size={18} />
+          </button>
+          <button
+            onClick={handleResetView}
+            aria-label="Centrar mapa"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <LocateFixed size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* --- FLOOR SWITCHER (MOBILE: COMPACT PILL CLEAR OF DOCK; DESKTOP: FULL CONTROLS) --- */}
       <div
-        className={`fixed left-1/2 -translate-x-1/2 z-20 items-center gap-1.5 sm:gap-2 max-w-[calc(100%-1.5rem)] bg-mnac-surface/95 backdrop-blur-xl shadow-2xl rounded-full p-1.5 border border-white/15 bottom-36 md:bottom-8 transition-all ${
+        className={`fixed left-1/2 -translate-x-1/2 z-20 items-center gap-2 bg-mnac-surface/95 backdrop-blur-xl shadow-2xl rounded-full p-1.5 border border-white/15 bottom-36 md:bottom-8 transition-all ${
           selectedRoom ? 'hidden md:flex' : 'flex'
         }`}
       >
@@ -547,55 +593,50 @@ const MapPage: React.FC<MapPageProps> = () => {
           ))}
         </div>
 
-        <div className="w-px h-6 bg-white/15" />
-
-        {/* Exploded 3D Toggle */}
-        <button
-          onClick={() => {
-            hapticService.light();
-            setExplodedView(!explodedView);
-          }}
-          aria-label="Vista 3D por plantas"
-          title="Separar plantas en 3D"
-          className={`w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-all ${
-            explodedView ? 'bg-mnac-accent/25 text-mnac-accent' : 'text-mnac-textSecondary hover:text-white'
-          }`}
-        >
-          <Layers size={19} />
-        </button>
-
-        {/* Zoom Out */}
-        <button
-          onClick={() => {
-            hapticService.light();
-            setScale((prev) => Math.max(0.85, Number((prev - 0.25).toFixed(2))));
-          }}
-          aria-label="Alejar"
-          className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
-        >
-          <ZoomOut size={19} />
-        </button>
-
-        {/* Zoom In */}
-        <button
-          onClick={() => {
-            hapticService.light();
-            setScale((prev) => Math.min(2.4, Number((prev + 0.25).toFixed(2))));
-          }}
-          aria-label="Acercar"
-          className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
-        >
-          <ZoomIn size={19} />
-        </button>
-
-        {/* Recenter */}
-        <button
-          onClick={handleResetView}
-          aria-label="Centrar mapa"
-          className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
-        >
-          <LocateFixed size={19} />
-        </button>
+        {/* Desktop-only inline Zoom/3D/Center controls */}
+        <div className="hidden md:flex items-center gap-1.5">
+          <div className="w-px h-6 bg-white/15 mx-1" />
+          <button
+            onClick={() => {
+              hapticService.light();
+              setExplodedView(!explodedView);
+            }}
+            aria-label="Vista 3D por plantas"
+            title="Separar plantas en 3D"
+            className={`w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-all ${
+              explodedView ? 'bg-mnac-accent/25 text-mnac-accent' : 'text-mnac-textSecondary hover:text-white'
+            }`}
+          >
+            <Layers size={19} />
+          </button>
+          <button
+            onClick={() => {
+              hapticService.light();
+              setScale((prev) => Math.max(0.75, Number((prev - 0.3).toFixed(2))));
+            }}
+            aria-label="Alejar"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <ZoomOut size={19} />
+          </button>
+          <button
+            onClick={() => {
+              hapticService.light();
+              setScale((prev) => Math.min(3, Number((prev + 0.3).toFixed(2))));
+            }}
+            aria-label="Acercar"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <ZoomIn size={19} />
+          </button>
+          <button
+            onClick={handleResetView}
+            aria-label="Centrar mapa"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-mnac-textSecondary hover:text-white active:scale-90 transition-all"
+          >
+            <LocateFixed size={19} />
+          </button>
+        </div>
       </div>
 
       {/* --- ROOM DETAIL CARD (FLOATS CLEANLY ABOVE BOTTOM NAVIGATION + SCANNER BUTTON ON MOBILE) --- */}
