@@ -24,7 +24,7 @@ export default {
           
           // Legacy mappings for compatibility
           textPrimary: '#D1CCBF',
-          textSecondary: '#9CA3AF', 
+          textSecondary: '#B5AFA4', 
           
           // Remapping old branding to new
           black: '#1F1F1F',

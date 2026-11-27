@@ -137,12 +137,12 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
         <section className="pt-24 md:pt-28 px-5 sm:px-6 md:px-12 pb-6 border-b border-white/10 max-w-[1920px] mx-auto w-full">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1.5">
-                Wallet Digital · {tickets.length} {tickets.length === 1 ? 'entrada' : 'entradas'}
-              </span>
               <h1 className="font-serif italic text-4xl sm:text-5xl md:text-6xl text-white leading-none tracking-tight">
                 Mis Tickets
               </h1>
+              <p className="text-xs text-mnac-textSecondary mt-1.5 tabular-nums">
+                {tickets.length} {tickets.length === 1 ? 'entrada digital activa' : 'entradas digitales activas'}
+              </p>
             </div>
 
             <button
@@ -173,7 +173,7 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
             {tickets.map((t) => (
               <div
                 key={t.id}
-                className="bg-mnac-surface border border-white/15 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+                className="bg-mnac-surface border border-white/12 rounded-2xl overflow-hidden flex flex-col"
               >
                 {/* Top Artwork Watermark Header */}
                 <div className="relative h-36 overflow-hidden">
@@ -301,7 +301,7 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
               <form
                 key="tab-online"
                 onSubmit={handleConfirmPurchase}
-                className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-crossfade"
+                className="bg-mnac-surface border border-white/10 rounded-2xl p-5 sm:p-7 space-y-6 animate-crossfade"
               >
                 <div>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
@@ -436,7 +436,7 @@ const TicketsPage: React.FC<TicketsPageProps> = ({ userRole }) => {
 
             {/* TAB 2: BUY AT THE MUSEUM */}
             {activeTab === 'museum' && (
-              <div key="tab-museum" className="bg-mnac-surface border border-white/10 rounded-3xl p-5 sm:p-7 space-y-6 animate-crossfade">
+              <div key="tab-museum" className="bg-mnac-surface border border-white/10 rounded-2xl p-5 sm:p-7 space-y-6 animate-crossfade">
                 <div>
                   <h2 className="font-serif italic text-2xl sm:text-3xl text-white">
                     Taquillas del Museo

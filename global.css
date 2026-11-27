@@ -26,6 +26,38 @@ body {
   overflow-x: hidden;
   overscroll-behavior: none;
   -webkit-touch-callout: none;
+  caret-color: #F14A32;
+}
+
+a {
+  text-underline-offset: 4px;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* Tabular numerals for prices, years, room codes, and durations */
+.tabular-nums,
+time,
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Themed subtle scrollbar on desktop */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1F1F1F;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(209, 204, 191, 0.22);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(209, 204, 191, 0.38);
 }
 
 /* Eliminate 300ms mobile tap delay & prevent accidental text selection on UI controls */

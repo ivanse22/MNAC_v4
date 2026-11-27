@@ -75,7 +75,7 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
             onClick={() => !isGenerating && setIsModalOpen(false)}
           />
           
-          <div className="bg-mnac-surface w-full max-w-lg rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden animate-modal-in">
+          <div className="bg-mnac-surface w-full max-w-lg rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.55)] relative z-10 overflow-hidden animate-modal-in">
             <div className="p-6 sm:p-8">
               <div className="flex justify-between items-start mb-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mnac-accent/15 border border-mnac-accent/30 text-mnac-accent">
@@ -216,15 +216,10 @@ const ToursPage: React.FC<ToursPageProps> = ({ userRole }) => {
         {/* FILTER HEADER & HORIZONTAL PILLS */}
         <div className="mb-8 space-y-4">
           <div className="flex items-end justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-                Selección Oficial
-              </span>
-              <h2 className="font-serif italic text-2xl sm:text-3xl text-white tracking-tight">
-                Rutas Curadas
-              </h2>
-            </div>
-            <span className="text-[11px] text-mnac-textSecondary font-medium">
+            <h2 className="font-serif italic text-2xl sm:text-3xl text-white tracking-tight">
+              Rutas Curadas
+            </h2>
+            <span className="text-[11px] text-mnac-textSecondary font-medium tabular-nums">
               {filteredTours.length} {filteredTours.length === 1 ? 'ruta' : 'rutas'}
             </span>
           </div>

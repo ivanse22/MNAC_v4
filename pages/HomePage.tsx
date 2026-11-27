@@ -161,7 +161,7 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
             <Link
               to={content.hero.linkPrimary}
               onClick={() => hapticService.light()}
-              className="hidden md:flex group items-center justify-center w-20 h-20 rounded-full bg-mnac-accent text-white hover:scale-110 transition-transform shadow-[0_0_30px_rgba(255,77,40,0.4)]"
+              className="hidden md:flex group items-center justify-center w-20 h-20 rounded-full bg-mnac-accent text-white hover:scale-105 transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
             >
               <ArrowRight size={32} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
             </Link>
@@ -263,14 +263,9 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
       {/* FEATURED SECTIONS - HORIZONTAL SNAP CAROUSEL ON MOBILE */}
       <section className="py-8 max-w-[1920px] mx-auto w-full">
         <div className="px-5 sm:px-6 md:px-12 flex items-center justify-between mb-5">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-              Colecciones
-            </span>
-            <h2 className="text-2xl md:text-3xl font-serif italic text-white tracking-tight">
-              Imprescindibles
-            </h2>
-          </div>
+          <h2 className="text-2xl md:text-3xl font-serif italic text-white tracking-tight">
+            Imprescindibles
+          </h2>
           <Link
             to="/tours"
             onClick={() => hapticService.light()}
@@ -320,14 +315,9 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
       {/* PARA TI HOY - HORIZONTAL ARTWORKS CAROUSEL */}
       <section className="py-6 max-w-[1920px] mx-auto w-full">
         <div className="px-5 sm:px-6 md:px-12 flex items-center justify-between mb-5">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-              Selección Curatorial
-            </span>
-            <h2 className="text-2xl md:text-3xl font-serif italic text-white tracking-tight">
-              Para ti hoy
-            </h2>
-          </div>
+          <h2 className="text-2xl md:text-3xl font-serif italic text-white tracking-tight">
+            Para ti hoy
+          </h2>
           <Link
             to="/tours"
             onClick={() => hapticService.light()}
@@ -399,7 +389,6 @@ const HomePage: React.FC<HomePageProps> = ({ role, onSetScrolled, onSetHeaderVis
 
       {/* FOOTER PREVIEW - MINIMAL */}
       <section className="bg-mnac-surface px-6 py-14 md:py-20 text-center mt-6">
-        <span className="text-mnac-accent text-xs font-bold uppercase tracking-widest mb-3 block">Agenda</span>
         <h2 className="text-3xl md:text-4xl font-serif italic text-white mb-6 tracking-tight">Exposiciones Temporales</h2>
         <div className="flex justify-center gap-4">
           <Link

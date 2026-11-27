@@ -682,7 +682,7 @@ const MapPage: React.FC<MapPageProps> = () => {
             ? 'none'
             : 'transform 380ms cubic-bezier(0.32, 0.72, 0, 1), opacity 240ms cubic-bezier(0.23, 1, 0.32, 1)'
         }}
-        className={`fixed z-30 bg-mnac-surface/95 backdrop-blur-xl shadow-2xl bottom-36 left-3 right-3 rounded-3xl border border-white/15 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
+        className={`fixed z-30 bg-mnac-surface/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] bottom-36 left-3 right-3 rounded-2xl border border-white/12 md:left-8 md:right-auto md:bottom-8 md:w-[410px] ${
           selectedRoom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >

@@ -37,7 +37,7 @@ const ArtCard: React.FC<ArtCardProps> = ({ artwork, isSaved, onToggleSave }) => 
           aria-label={isSaved ? 'Quitar de guardados' : 'Guardar obra'}
           className={`absolute top-3 right-3 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-90 ${
             isSaved 
-              ? 'bg-mnac-accent text-white shadow-[0_0_15px_rgba(241,74,50,0.45)]' 
+              ? 'bg-mnac-accent text-white shadow-[0_4px_14px_rgba(0,0,0,0.35)]' 
               : 'bg-black/50 backdrop-blur-md text-white hover:bg-white hover:text-black'
           }`}
         >

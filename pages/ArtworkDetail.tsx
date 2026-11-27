@@ -266,7 +266,7 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
               {artwork.title}
             </h1>
 
-            <p className="text-lg sm:text-xl font-sans font-light text-mnac-secondary mb-6 border-l-2 border-mnac-accent pl-4">
+            <p className="text-lg sm:text-xl font-sans font-normal text-mnac-secondary mb-6">
               {artwork.artist}
             </p>
 
@@ -405,14 +405,9 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
       {relatedArtworks.length > 0 && (
         <section className="py-10 border-t border-white/10 max-w-[1920px] mx-auto">
           <div className="px-5 sm:px-6 md:px-12 flex items-center justify-between mb-5">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-mnac-accent block mb-1">
-                Sigue Explorando
-              </span>
-              <h2 className="font-serif italic text-2xl md:text-3xl text-white tracking-tight">
-                Obras Relacionadas
-              </h2>
-            </div>
+            <h2 className="font-serif italic text-2xl md:text-3xl text-white tracking-tight">
+              Obras Relacionadas
+            </h2>
             <Link
               to="/collection"
               onClick={() => hapticService.light()}
