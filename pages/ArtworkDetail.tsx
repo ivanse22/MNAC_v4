@@ -19,7 +19,7 @@ import {
 import { UserRole } from '../types';
 import { ARTWORKS_DATA } from '../data/artworks';
 import Footer from '../components/Footer';
-import { generateTourScript, textToSpeech } from '../services/geminiService';
+import { generateTourScript, textToSpeech, getPreloadedAudioPath } from '../services/geminiService';
 import OptimizedImage from '../components/OptimizedImage';
 import { hapticService } from '../services/hapticService';
 
@@ -143,6 +143,27 @@ const ArtworkDetail: React.FC<ArtworkDetailProps> = ({
 
     setIsGeneratingAudio(true);
     try {
+      const preloadedUrl = getPreloadedAudioPath(artwork.id, 'Aoede');
+      let hasPreloaded = false;
+      try {
+        const headRes = await fetch(preloadedUrl, { method: 'HEAD' });
+        const contentType = headRes.headers.get('content-type') || '';
+        hasPreloaded = headRes.ok && !contentType.includes('text/html');
+      } catch {
+        hasPreloaded = false;
+      }
+
+      if (hasPreloaded) {
+        setAudioUrl(preloadedUrl);
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play();
+            setIsAudioPlaying(true);
+          }
+        }, 50);
+        return;
+      }
+
       const script = await generateTourScript(artwork, 'student');
       const url = await textToSpeech(script);
       if (url) {

@@ -6,6 +6,8 @@ import { ARTWORK_LOCATIONS, LEVEL_INFO } from '../data/museumMap';
 import {
   generateTourScript,
   textToSpeech,
+  getPreloadedAudioPath,
+  getVoiceDisplayName,
   TTS_VOICES,
   TtsVoiceName
 } from '../services/geminiService';
@@ -102,7 +104,7 @@ const TourPlayer: React.FC<TourPlayerProps> = ({ userRole }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [script, setScript] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [voiceEngineLabel, setVoiceEngineLabel] = useState<string>('Gemini 2.5 TTS · Aoede');
+  const [voiceEngineLabel, setVoiceEngineLabel] = useState<string>('Voz Neuronal · Elvira');
 
   const [isGeneratingScript, setIsGeneratingScript] = useState(true);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
@@ -231,6 +233,30 @@ const TourPlayer: React.FC<TourPlayerProps> = ({ userRole }) => {
       setAudioUrl(null);
       setProgress(0);
 
+      const narratorName = getVoiceDisplayName(selectedVoice);
+      const preloadedUrl = getPreloadedAudioPath(currentArtwork.id, selectedVoice);
+      let hasPreloadedAudio = false;
+      try {
+        const headRes = await fetch(preloadedUrl, { method: 'HEAD' });
+        const contentType = headRes.headers.get('content-type') || '';
+        hasPreloadedAudio = headRes.ok && !contentType.includes('text/html');
+      } catch {
+        hasPreloadedAudio = false;
+      }
+      if (cancelled) return;
+
+      if (hasPreloadedAudio) {
+        const curatedScript = `${currentArtwork.title}, de ${currentArtwork.artist}, año ${currentArtwork.year}. ${currentArtwork.description}`;
+        setScript(curatedScript);
+        setIsGeneratingScript(false);
+        usingSpeechFallbackRef.current = false;
+        setVoiceEngineLabel(`Voz Neuronal · ${narratorName}`);
+        setAudioUrl(preloadedUrl);
+        setIsPlaying(true);
+        setIsGeneratingAudio(false);
+        return;
+      }
+
       const cacheKey = `${currentArtwork.id}-${userRole || 'visitor'}`;
       let text = scriptCacheRef.current.get(cacheKey);
       if (!text) {
@@ -253,7 +279,7 @@ const TourPlayer: React.FC<TourPlayerProps> = ({ userRole }) => {
       if (url) {
         createdBlobUrl = url;
         usingSpeechFallbackRef.current = false;
-        setVoiceEngineLabel(`Gemini 2.5 TTS · ${selectedVoice}`);
+        setVoiceEngineLabel(`Gemini 2.5 TTS · ${narratorName}`);
         setAudioUrl(url);
         setIsPlaying(true);
       } else {

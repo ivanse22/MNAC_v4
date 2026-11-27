@@ -53,11 +53,20 @@ function writeString(view: DataView, offset: number, string: string) {
 
 export type TtsVoiceName = 'Aoede' | 'Charon' | 'Leda';
 
-export const TTS_VOICES: { id: TtsVoiceName; label: string; desc: string }[] = [
-  { id: 'Aoede', label: 'Guía Cálida', desc: 'Cercana y narrativa' },
-  { id: 'Charon', label: 'Documental', desc: 'Pausada y profunda' },
-  { id: 'Leda', label: 'Clara', desc: 'Ágil y luminosa' }
+export const TTS_VOICES: { id: TtsVoiceName; label: string; narrator: string; folder: string; desc: string }[] = [
+  { id: 'Aoede', label: 'Elvira', narrator: 'Elvira', folder: 'elvira', desc: 'Cálida y narrativa' },
+  { id: 'Charon', label: 'Álvaro', narrator: 'Álvaro', folder: 'alvaro', desc: 'Documental y profunda' },
+  { id: 'Leda', label: 'Dalia', narrator: 'Dalia', folder: 'dalia', desc: 'Clara y expresiva' }
 ];
+
+export const getVoiceDisplayName = (voice: TtsVoiceName): string => {
+  return TTS_VOICES.find((v) => v.id === voice)?.narrator || 'Elvira';
+};
+
+export const getPreloadedAudioPath = (artworkId: string, voice: TtsVoiceName = 'Aoede'): string => {
+  const folder = TTS_VOICES.find((v) => v.id === voice)?.folder || 'elvira';
+  return `/audio/${folder}/${artworkId}.mp3`;
+};
 
 const getClientApiKey = (): string | undefined => {
   const viteKey = (import.meta as any)?.env?.VITE_GEMINI_API_KEY;
